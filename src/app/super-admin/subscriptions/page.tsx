@@ -249,48 +249,48 @@ export default function SubscriptionsPage() {
 
   return (
     <DashboardLayout requiredRole="super_admin">
-      <div className="p-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Subscription Management</h1>
-          <p className="text-gray-600 mt-1">Manage plan requests and view all client subscriptions</p>
+      <div className="p-4 md:p-8">
+        <div className="mb-6 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Subscription Management</h1>
+          <p className="text-sm md:text-base text-gray-600 mt-1">Manage plan requests and view all client subscriptions</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('requests')}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Pending Requests</CardTitle>
-              <Bell className="h-5 w-5 text-yellow-600" />
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Pending Requests</CardTitle>
+              <Bell className="h-4 w-4 md:h-5 md:w-5 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{pendingCount}</div>
+              <div className="text-lg md:text-2xl font-bold text-yellow-600">{pendingCount}</div>
             </CardContent>
           </Card>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Active</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Active</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{activeCount}</div>
+              <div className="text-lg md:text-2xl font-bold text-green-600">{activeCount}</div>
             </CardContent>
           </Card>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Trial</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Trial</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{trialCount}</div>
+              <div className="text-lg md:text-2xl font-bold text-blue-600">{trialCount}</div>
             </CardContent>
           </Card>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Expired</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Expired</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{expiredCount}</div>
+              <div className="text-lg md:text-2xl font-bold text-red-600">{expiredCount}</div>
             </CardContent>
           </Card>
         </div>

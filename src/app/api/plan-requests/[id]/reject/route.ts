@@ -5,11 +5,12 @@ import { connectDB } from '@/lib/db-config';
 // POST - Reject plan activation request
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { approvedBy, approvalNotes } = await request.json();
-    const requestId = parseInt(params.id);
+    const { id } = await params;
+    const requestId = parseInt(id);
 
     if (!approvedBy) {
       return NextResponse.json(
@@ -29,7 +30,6 @@ export async function POST(
       `);
 
     if (requestResult.recordset.length === 0) {
-      await pool.close();
       return NextResponse.json(
         { success: false, message: 'Request not found or already processed' },
         { status: 404 }
@@ -50,8 +50,6 @@ export async function POST(
             approvedAt = @approvedAt
         WHERE id = @requestId
       `);
-
-    await pool.close();
 
     return NextResponse.json({
       success: true,

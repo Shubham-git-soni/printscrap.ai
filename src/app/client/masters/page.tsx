@@ -16,7 +16,7 @@ import { confirmDelete } from '@/lib/toast';
 
 export default function MastersPage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'category' | 'subcategory' | 'unit' | 'department' | 'machine'>('category');
+  const [activeTab, setActiveTab] = useState<'category' | 'subcategory' | 'unit' | 'department' | 'machine'>('unit');
 
   // Category state
   const [categories, setCategories] = useState<ScrapCategory[]>([]);
@@ -384,29 +384,11 @@ export default function MastersPage() {
 
   return (
     <DashboardLayout requiredRole="client">
-      <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Masters</h1>
+      <div className="p-4 md:p-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">Masters</h1>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b overflow-x-auto">
-          <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'category'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
-              }`}
-            onClick={() => setActiveTab('category')}
-          >
-            Categories
-          </button>
-          <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'subcategory'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
-              }`}
-            onClick={() => setActiveTab('subcategory')}
-          >
-            Sub-Categories
-          </button>
           <button
             className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'unit'
               ? 'border-b-2 border-primary text-primary'
@@ -433,6 +415,24 @@ export default function MastersPage() {
             onClick={() => setActiveTab('machine')}
           >
             Machines
+          </button>
+          <button
+            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'category'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
+              }`}
+            onClick={() => setActiveTab('category')}
+          >
+            Categories
+          </button>
+          <button
+            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'subcategory'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
+              }`}
+            onClick={() => setActiveTab('subcategory')}
+          >
+            Sub-Categories
           </button>
         </div>
 

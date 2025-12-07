@@ -69,32 +69,7 @@ export async function POST(request: Request) {
 
       const userId = userResult.recordset[0].id;
 
-      // Create 1-day trial subscription
-      const now = new Date();
-      const trialEnd = new Date(now);
-      trialEnd.setDate(trialEnd.getDate() + 1);
-
-      const subResult = await transaction
-        .request()
-        .input('userId', sql.Int, userId)
-        .input('planId', sql.Int, 1)
-        .input('startDate', sql.DateTime, now)
-        .input('endDate', sql.DateTime, trialEnd)
-        .query(`
-          INSERT INTO Subscriptions (userId, planId, status, startDate, endDate, autoRenew)
-          OUTPUT INSERTED.id
-          VALUES (@userId, @planId, 'trial', @startDate, @endDate, 0)
-        `);
-
-      const subscriptionId = subResult.recordset[0].id;
-
-      // Update user with subscription ID
-      await transaction
-        .request()
-        .input('userId', sql.Int, userId)
-        .input('subscriptionId', sql.Int, subscriptionId)
-        .query('UPDATE Users SET subscriptionId = @subscriptionId WHERE id = @userId');
-
+      // Don't create any subscription - client will request a plan after registration
       await transaction.commit();
 
       // Fetch created user
@@ -120,7 +95,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json({
         success: true,
-        message: 'Registration successful. Please check your email to verify your account. You have been granted a 1-day trial.',
+        message: 'Registration successful. Please check your email to verify your account.',
         data: { user, authHeader },
       });
     } catch (txError: any) {

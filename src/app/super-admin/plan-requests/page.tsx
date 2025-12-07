@@ -141,47 +141,47 @@ export default function PlanRequestsPage() {
 
   return (
     <DashboardLayout requiredRole="super_admin">
-      <div className="p-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Plan Activation Requests</h1>
-          <p className="text-gray-600 mt-1">Review and manage client plan activation requests</p>
+      <div className="p-4 md:p-8">
+        <div className="mb-6 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Plan Activation Requests</h1>
+          <p className="text-sm md:text-base text-gray-600 mt-1">Review and manage client plan activation requests</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Pending Requests
               </CardTitle>
-              <Clock className="h-5 w-5 text-yellow-600" />
+              <Clock className="h-4 w-4 md:h-5 md:w-5 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{pendingCount}</div>
+              <div className="text-lg md:text-2xl font-bold">{pendingCount}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Approved
               </CardTitle>
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{approvedCount}</div>
+              <div className="text-lg md:text-2xl font-bold">{approvedCount}</div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="col-span-2 md:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Rejected
               </CardTitle>
-              <XCircle className="h-5 w-5 text-red-600" />
+              <XCircle className="h-4 w-4 md:h-5 md:w-5 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{rejectedCount}</div>
+              <div className="text-lg md:text-2xl font-bold">{rejectedCount}</div>
             </CardContent>
           </Card>
         </div>

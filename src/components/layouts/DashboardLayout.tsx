@@ -7,6 +7,7 @@ import { Sidebar } from './Sidebar';
 import { TrialExpiredModal } from '@/components/TrialExpiredModal';
 import { apiClient } from '@/lib/api-client';
 import { Plan } from '@/lib/types';
+import { Menu } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
   const [showTrialExpired, setShowTrialExpired] = useState(false);
   const [isTrialExpired, setIsTrialExpired] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -83,8 +85,18 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-y-auto bg-gray-50">
+        {/* Mobile header with hamburger menu */}
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <Menu className="h-6 w-6 text-gray-700" />
+          </button>
+          <h1 className="text-lg font-semibold text-gray-900">PrintScrap.ai</h1>
+        </div>
         {shouldBlockAccess ? (
           <div className="p-8">
             <div className="max-w-2xl mx-auto">

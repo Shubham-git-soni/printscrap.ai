@@ -98,63 +98,63 @@ export default function ClientDashboard() {
 
   return (
     <DashboardLayout requiredRole="client">
-      <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back, {user?.companyName}!</p>
+      <div className="p-4 md:p-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm md:text-base text-gray-600 mt-1">Welcome back, {user?.companyName}!</p>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Total Estimated Scrap
               </CardTitle>
-              <IndianRupee className="h-5 w-5 text-green-600" />
+              <IndianRupee className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{stats.totalScrapValue.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">Current inventory value</p>
+              <div className="text-lg md:text-2xl font-bold">₹{stats.totalScrapValue.toLocaleString()}</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">Current inventory value</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Total Revenue
               </CardTitle>
-              <TrendingUp className="h-5 w-5 text-blue-600" />
+              <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Rs.{stats.totalRevenue.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">From sales</p>
+              <div className="text-lg md:text-2xl font-bold">Rs.{stats.totalRevenue.toLocaleString()}</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">From sales</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Total Stock Weight
               </CardTitle>
-              <Weight className="h-5 w-5 text-orange-600" />
+              <Weight className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalStockWeight.toFixed(1)} Kg</div>
-              <p className="text-xs text-gray-500 mt-1">Available stock</p>
+              <div className="text-lg md:text-2xl font-bold">{stats.totalStockWeight.toFixed(1)} Kg</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">Available stock</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Stock Items
               </CardTitle>
-              <Package className="h-5 w-5 text-purple-600" />
+              <Package className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalStockCount}</div>
-              <p className="text-xs text-gray-500 mt-1">Different categories</p>
+              <div className="text-lg md:text-2xl font-bold">{stats.totalStockCount}</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">Different categories</p>
             </CardContent>
           </Card>
         </div>

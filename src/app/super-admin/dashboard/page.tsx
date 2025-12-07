@@ -25,13 +25,13 @@ export default function SuperAdminDashboard() {
 
   const loadData = async () => {
     try {
-      const [users, plans] = await Promise.all([
+      const [usersData, plans] = await Promise.all([
         apiClient.getUsers(),
         apiClient.getPlans(),
       ]);
 
       // Filter only clients
-      const clients = users.filter((u: any) => u.role === 'client');
+      const clients = (usersData as any[]).filter((u: any) => u.role === 'client');
       const activeClients = clients.filter((u: any) => u.isActive);
 
       // Active subscriptions (from user data which includes subscription info)
@@ -39,7 +39,7 @@ export default function SuperAdminDashboard() {
 
       // Calculate total revenue (sum of all active subscriptions)
       const totalRevenue = activeSubs.reduce((sum: number, user: any) => {
-        const plan = plans.find((p: any) => p.name === user.planName);
+        const plan = (plans as any[]).find((p: any) => p.name === user.planName);
         return sum + (plan?.price || 0);
       }, 0);
 
@@ -70,7 +70,7 @@ export default function SuperAdminDashboard() {
         endDate: user.subscriptionEndDate,
         autoRenew: false,
         user: user,
-        plan: plans.find((p: any) => p.name === user.planName),
+        plan: (plans as any[]).find((p: any) => p.name === user.planName),
       }));
       setRecentSubscriptions(recentSubs);
     } catch (error) {
@@ -80,67 +80,67 @@ export default function SuperAdminDashboard() {
 
   return (
     <DashboardLayout requiredRole="super_admin">
-      <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Super Admin Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back, {user?.companyName}!</p>
+      <div className="p-4 md:p-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Super Admin Dashboard</h1>
+          <p className="text-sm md:text-base text-gray-600 mt-1">Welcome back, {user?.companyName}!</p>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Total Clients
               </CardTitle>
-              <Users className="h-5 w-5 text-blue-600" />
+              <Users className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalClients}</div>
-              <p className="text-xs text-gray-500 mt-1">{stats.activeClients} active</p>
+              <div className="text-lg md:text-2xl font-bold">{stats.totalClients}</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">{stats.activeClients} active</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Active Subscriptions
               </CardTitle>
-              <CreditCard className="h-5 w-5 text-green-600" />
+              <CreditCard className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.activeSubscriptions}</div>
-              <p className="text-xs text-gray-500 mt-1">Current active plans</p>
+              <div className="text-lg md:text-2xl font-bold">{stats.activeSubscriptions}</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">Current active plans</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Monthly Revenue
               </CardTitle>
-              <IndianRupee className="h-5 w-5 text-purple-600" />
+              <IndianRupee className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1">From active subscriptions</p>
+              <div className="text-lg md:text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">From active subscriptions</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
+              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
                 Conversion Rate
               </CardTitle>
-              <TrendingUp className="h-5 w-5 text-orange-600" />
+              <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-lg md:text-2xl font-bold">
                 {stats.totalClients > 0
                   ? ((stats.activeSubscriptions / stats.totalClients) * 100).toFixed(1)
                   : 0}%
               </div>
-              <p className="text-xs text-gray-500 mt-1">Clients with subscriptions</p>
+              <p className="text-xs text-gray-500 mt-1 hidden md:block">Clients with subscriptions</p>
             </CardContent>
           </Card>
         </div>

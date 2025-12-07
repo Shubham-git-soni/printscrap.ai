@@ -84,13 +84,13 @@ export default function PlansPage() {
 
   return (
     <DashboardLayout requiredRole="super_admin">
-      <div className="p-8">
-        <div className="mb-6 flex justify-between items-center">
+      <div className="p-4 md:p-8">
+        <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Plan Management</h1>
-            <p className="text-gray-600 mt-1">Create and manage subscription plans</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Plan Management</h1>
+            <p className="text-sm md:text-base text-gray-600 mt-1">Create and manage subscription plans</p>
           </div>
-          <Button onClick={() => setShowAddForm(!showAddForm)}>
+          <Button onClick={() => setShowAddForm(!showAddForm)} className="w-full md:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             {showAddForm ? 'Cancel' : 'Add New Plan'}
           </Button>

@@ -283,7 +283,7 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
-  approvePlanRequest: (requestId: number, data: { approvedBy: number; approvalNotes?: string }) =>
+  approvePlanRequest: (requestId: number, data: { approvedBy: number; approvalNotes?: string; startDate?: string; endDate?: string }) =>
     apiFetch(`/plan-requests/${requestId}/approve`, {
       method: 'POST',
       body: JSON.stringify(data),
