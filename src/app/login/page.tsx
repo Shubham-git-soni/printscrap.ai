@@ -21,10 +21,10 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
 
-    const success = await login(email, password);
+    const errorMessage = await login(email, password);
 
-    if (!success) {
-      setError('Invalid email or password. Please try again.');
+    if (errorMessage) {
+      setError(errorMessage);
       setIsLoading(false);
     }
   };

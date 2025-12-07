@@ -39,8 +39,8 @@ export default function InventoryPage() {
     try {
       const [stockData, cats, subs] = await Promise.all([
         apiClient.getStock(user.id),
-        apiClient.getCategories(),
-        apiClient.getSubCategories(),
+        apiClient.getCategories(user.id),
+        apiClient.getSubCategories(user.id),
       ]) as [StockItem[], ScrapCategory[], ScrapSubCategory[]];
 
       setStock(stockData);

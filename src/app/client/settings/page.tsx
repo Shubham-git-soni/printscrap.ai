@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiClient } from '@/lib/api-client';
 import { Subscription, Plan } from '@/lib/types';
-import { Settings as SettingsIcon, User as UserIcon, CreditCard, CheckCircle } from 'lucide-react';
+import { Settings as SettingsIcon, User as UserIcon, CreditCard, CheckCircle, Mail, Phone, AlertCircle } from 'lucide-react';
 
 export default function SettingsPage() {
   const { user, setUser } = useAuth();
@@ -26,6 +26,7 @@ export default function SettingsPage() {
   // Subscription state
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [allPlans, setAllPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -43,6 +44,8 @@ export default function SettingsPage() {
               apiClient.getPlans(),
             ]) as [Subscription | null, Plan[]];
 
+            setAllPlans(plans); // Store all plans
+
             if (sub && sub.id) {
               setSubscription(sub);
               const p = plans.find((pl) => pl.id === sub.planId);
@@ -50,6 +53,14 @@ export default function SettingsPage() {
             }
           } catch (error) {
             console.error('Error loading subscription:', error);
+          }
+        } else {
+          // Even if no subscription, load plans
+          try {
+            const plans = await apiClient.getPlans() as Plan[];
+            setAllPlans(plans);
+          } catch (error) {
+            console.error('Error loading plans:', error);
           }
         }
       }
@@ -227,7 +238,8 @@ export default function SettingsPage() {
 
         {/* Subscription Tab */}
         {activeTab === 'subscription' && (
-          <div className="max-w-2xl">
+          <div className="space-y-6">
+            {/* Current Subscription Card */}
             <Card>
               <CardHeader>
                 <CardTitle>Current Subscription</CardTitle>
@@ -242,8 +254,8 @@ export default function SettingsPage() {
                           <p className="text-gray-600 mt-1">{plan.description}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-3xl font-bold text-primary">Rs.{plan.price}</p>
-                          <p className="text-sm text-gray-600">per {plan.billingCycle}</p>
+                          <p className="text-3xl font-bold text-primary">₹{plan.price}</p>
+                          <p className="text-sm text-gray-600">per {plan.billingCycle || 'month'}</p>
                         </div>
                       </div>
 
@@ -251,9 +263,9 @@ export default function SettingsPage() {
                         <div>
                           <p className="text-sm text-gray-600">Status</p>
                           <span className={`inline-flex px-3 py-1 mt-1 rounded-full text-sm font-medium ${subscription.status === 'active' ? 'bg-green-100 text-green-700' :
-                            subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                              subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                'bg-yellow-100 text-yellow-700'
+                              subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                                subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                  'bg-yellow-100 text-yellow-700'
                             }`}>
                             {subscription.status}
                           </span>
@@ -271,6 +283,22 @@ export default function SettingsPage() {
                           <p className="font-medium mt-1">{subscription.autoRenew ? 'Yes' : 'No'}</p>
                         </div>
                       </div>
+
+                      {/* Trial Expiry Warning */}
+                      {subscription.status === 'trial' && (
+                        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                          <div className="flex gap-3">
+                            <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
+                            <div>
+                              <p className="font-medium text-yellow-900">Trial Period Active</p>
+                              <p className="text-sm text-yellow-700 mt-1">
+                                Your trial ends on {new Date(subscription.endDate).toLocaleDateString()}.
+                                Contact us to activate a paid plan and continue using all features.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="border-t pt-4">
@@ -292,6 +320,104 @@ export default function SettingsPage() {
                     <p className="text-sm text-gray-500">Contact your administrator to activate a subscription</p>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Available Plans */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Available Plans</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">Choose a plan that fits your business needs</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {allPlans.map((availablePlan) => (
+                    <Card key={availablePlan.id} className="border-2 hover:shadow-lg transition-shadow">
+                      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+                        <CardTitle className="text-xl">{availablePlan.name}</CardTitle>
+                        <p className="text-sm text-gray-600">{availablePlan.description}</p>
+                        <div className="mt-4">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-3xl font-bold text-primary">₹{availablePlan.price}</span>
+                            <span className="text-gray-600">/ {availablePlan.billingCycle || 'month'}</span>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <ul className="space-y-2 mb-4">
+                          {availablePlan.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-sm">
+                              <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        {subscription?.planId === availablePlan.id ? (
+                          <Button disabled className="w-full">
+                            Current Plan
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => {
+                              // Scroll to contact section
+                              document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
+                            }}
+                          >
+                            Select Plan
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact Information */}
+            <Card id="contact-section">
+              <CardHeader>
+                <CardTitle>Contact Us for Plan Activation</CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Interested in upgrading? Reach out to us and we'll activate your chosen plan
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <Mail className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="font-semibold text-gray-900">Email Us</p>
+                      <a href="mailto:support@printscrap.ai" className="text-blue-600 hover:underline mt-1 block">
+                        support@printscrap.ai
+                      </a>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Send us an email with your plan choice and we'll get back to you within 24 hours.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <Phone className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="font-semibold text-gray-900">Call Us</p>
+                      <a href="tel:+919876543210" className="text-green-600 hover:underline mt-1 block">
+                        +91 98765 43210
+                      </a>
+                      <p className="text-sm text-gray-600 mt-2">
+                        Call us during business hours (9 AM - 6 PM IST) for instant assistance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+                  <p className="text-sm text-gray-700">
+                    <strong>Note:</strong> After selecting a plan, contact us with your company name and desired plan.
+                    Our admin will activate your subscription within 24 hours.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>

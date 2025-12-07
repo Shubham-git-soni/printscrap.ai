@@ -29,19 +29,16 @@ export async function POST(request: Request) {
     // Connect to database
     const pool = await sql.connect(config);
 
-    // Query user from database
+    // Query user from database by email only
     const result = await pool
       .request()
       .input('email', sql.NVarChar, email)
-      .input('password', sql.NVarChar, password)
       .query(`
-        SELECT id, email, role, companyName, contactNumber, address,
+        SELECT id, email, password, role, companyName, contactNumber, address,
                isActive, isVerified, subscriptionId, createdAt
         FROM Users
-        WHERE email = @email AND password = @password
+        WHERE email = @email
       `);
-
-
 
     if (result.recordset.length === 0) {
       return NextResponse.json(
@@ -52,12 +49,34 @@ export async function POST(request: Request) {
 
     const user = result.recordset[0];
 
-    if (!user.isActive) {
+    console.log('🔍 Login Debug:');
+    console.log('Email:', email);
+    console.log('User found:', user.email);
+    console.log('Password match:', user.password === password);
+    console.log('isActive:', user.isActive, 'Type:', typeof user.isActive);
+
+    // Check password
+    if (user.password !== password) {
+      console.log('❌ Password mismatch');
       return NextResponse.json(
-        { success: false, message: 'Account is not active' },
+        { success: false, message: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+
+    console.log('✅ Password correct, checking active status...');
+
+    // Check if account is active
+    if (!user.isActive) {
+      console.log('❌ Account is deactivated');
+      return NextResponse.json(
+        { success: false, message: 'Your account has been deactivated. Please contact the super admin to reactivate your account.' },
         { status: 403 }
       );
     }
+
+    // Remove password from response
+    delete user.password;
 
     const authHeader = `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`;
 

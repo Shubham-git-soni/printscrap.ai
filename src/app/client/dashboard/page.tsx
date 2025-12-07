@@ -29,8 +29,8 @@ export default function ClientDashboard() {
         // Get data from API
         const [stock, sales, categories] = await Promise.all([
           apiClient.getStock(user.id),
-          apiClient.getSales(),
-          apiClient.getCategories(),
+          apiClient.getSales(user.id),
+          apiClient.getCategories(user.id),
         ]) as [any[], any[], any[]];
 
         console.log('📊 Dashboard Data:', { stock, sales });
@@ -77,7 +77,7 @@ export default function ClientDashboard() {
         setCategoryData(catData);
 
         // Prepare weekly volume data from recent scrap entries
-        const scrapEntries = await apiClient.getScrapEntries() as any[];
+        const scrapEntries = await apiClient.getScrapEntries(user.id) as any[];
         const userEntries = scrapEntries.filter((e: any) => e.createdBy === user.id);
         const last7Days = userEntries.slice(0, 7).reverse();
 

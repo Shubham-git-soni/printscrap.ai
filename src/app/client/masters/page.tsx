@@ -69,13 +69,15 @@ export default function MastersPage() {
   }, []);
 
   const loadData = async () => {
+    if (!user) return;
+
     try {
       const [cats, subCats, unitsData, depts, machs] = await Promise.all([
-        apiClient.getCategories(),
-        apiClient.getSubCategories(),
-        apiClient.getUnits(),
-        apiClient.getDepartments(),
-        apiClient.getMachines(),
+        apiClient.getCategories(user.id),
+        apiClient.getSubCategories(user.id),
+        apiClient.getUnits(user.id),
+        apiClient.getDepartments(user.id),
+        apiClient.getMachines(user.id),
       ]);
       setCategories(cats as ScrapCategory[]);
       setSubCategories(subCats as ScrapSubCategory[]);
@@ -106,6 +108,7 @@ export default function MastersPage() {
           name: newCategory.name,
           marketRate: parseFloat(newCategory.marketRate),
           unit: newCategory.unit,
+          createdBy: user!.id,
         });
       }
 
@@ -147,10 +150,15 @@ export default function MastersPage() {
 
     try {
       if (editingSubCategoryId) {
-        // Update not implemented yet - delete and recreate
-        console.warn('Update subcategory not implemented');
+        // Update existing sub-category
+        await apiClient.updateSubCategory(editingSubCategoryId, {
+          categoryId: parseInt(newSubCategory.categoryId),
+          name: newSubCategory.name,
+          size: newSubCategory.size,
+          unit: newSubCategory.unit,
+          remarks: newSubCategory.remarks,
+        });
         setEditingSubCategoryId(null);
-        return;
       } else {
         // Create new sub-category with all fields
         await apiClient.createSubCategory({
@@ -159,6 +167,7 @@ export default function MastersPage() {
           size: newSubCategory.size,
           unit: newSubCategory.unit,
           remarks: newSubCategory.remarks,
+          createdBy: user!.id,
         });
       }
 
@@ -215,15 +224,18 @@ export default function MastersPage() {
 
     try {
       if (editingUnitId) {
-        // Update not implemented yet
-        console.warn('Update unit not implemented');
+        // Update existing unit
+        await apiClient.updateUnit(editingUnitId, {
+          name: newUnit.name,
+          symbol: newUnit.symbol,
+        });
         setEditingUnitId(null);
-        return;
       } else {
         // Create new unit
         await apiClient.createUnit({
           name: newUnit.name,
           symbol: newUnit.symbol,
+          createdBy: user!.id,
         });
       }
 
@@ -265,15 +277,18 @@ export default function MastersPage() {
 
     try {
       if (editingDepartmentId) {
-        // Update not implemented yet
-        console.warn('Update department not implemented');
+        // Update existing department
+        await apiClient.updateDepartment(editingDepartmentId, {
+          name: newDepartment.name,
+          description: newDepartment.description,
+        });
         setEditingDepartmentId(null);
-        return;
       } else {
         // Create new department
         await apiClient.createDepartment({
           name: newDepartment.name,
           description: newDepartment.description,
+          createdBy: user!.id,
         });
       }
 
@@ -315,10 +330,14 @@ export default function MastersPage() {
 
     try {
       if (editingMachineId) {
-        // Update not implemented yet
-        console.warn('Update machine not implemented');
+        // Update existing machine
+        await apiClient.updateMachine(editingMachineId, {
+          name: newMachine.name,
+          departmentId: parseInt(newMachine.departmentId),
+          model: newMachine.model,
+          manufacturer: newMachine.manufacturer,
+        });
         setEditingMachineId(null);
-        return;
       } else {
         // Create new machine
         await apiClient.createMachine({
@@ -326,6 +345,7 @@ export default function MastersPage() {
           departmentId: parseInt(newMachine.departmentId),
           model: newMachine.model,
           manufacturer: newMachine.manufacturer,
+          createdBy: user!.id,
         });
       }
 

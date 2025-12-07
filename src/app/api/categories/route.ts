@@ -2,10 +2,19 @@ import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'userId is required' }, { status: 400 });
+    }
+
     const pool = await connectDB();
-    const result = await pool.request().query('SELECT * FROM Categories ORDER BY name');
+    const result = await pool.request()
+      .input('userId', sql.Int, parseInt(userId))
+      .query('SELECT * FROM Categories WHERE createdBy = @userId ORDER BY name');
 
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {
@@ -16,6 +25,11 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { name, marketRate, unit, createdBy } = await request.json();
+
+    if (!createdBy || createdBy <= 0) {
+      return NextResponse.json({ success: false, message: 'createdBy is required' }, { status: 400 });
+    }
+
     const pool = await connectDB();
     const result = await pool.request()
       .input('name', sql.NVarChar, name)

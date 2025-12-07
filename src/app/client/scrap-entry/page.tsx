@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { Plus, FileText, Package, Calendar } from 'lucide-react';
 
 export default function ScrapEntryPage() {
   const { user } = useAuth();
+  const { canPerformOperations, isExpired, daysRemaining } = useSubscription();
   const [activeTab, setActiveTab] = useState<'job-based' | 'general'>('job-based');
 
   // Master data
@@ -60,14 +62,16 @@ export default function ScrapEntryPage() {
   }, [user]);
 
   const loadData = async () => {
+    if (!user) return;
+
     try {
       const [cats, subs, entries, depts, machs, unitsData] = await Promise.all([
-        apiClient.getCategories(),
-        apiClient.getSubCategories(),
-        apiClient.getScrapEntries(),
-        apiClient.getDepartments(),
-        apiClient.getMachines(),
-        apiClient.getUnits(),
+        apiClient.getCategories(user.id),
+        apiClient.getSubCategories(user.id),
+        apiClient.getScrapEntries(user.id),
+        apiClient.getDepartments(user.id),
+        apiClient.getMachines(user.id),
+        apiClient.getUnits(user.id),
       ]);
 
       setCategories(cats as ScrapCategory[]);

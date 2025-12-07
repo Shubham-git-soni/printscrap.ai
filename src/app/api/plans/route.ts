@@ -5,34 +5,39 @@ import { connectDB } from '@/lib/db-config';
 export async function GET() {
   try {
     const pool = await connectDB();
-    const result = await pool.request().query('SELECT * FROM Plans ORDER BY price');
+    const result = await pool.request().query('SELECT * FROM Plans ORDER BY price ASC');
 
-
-    // Parse features JSON string and ensure all fields are present
-    const plans = result.recordset.map((plan: any) => ({
+    // Parse features JSON for each plan
+    const plans = result.recordset.map(plan => ({
       ...plan,
-      features: plan.features ? JSON.parse(plan.features) : [],
-      billingCycle: plan.billingCycle || 'month'
+      features: plan.features ? JSON.parse(plan.features) : []
     }));
 
     return NextResponse.json({ success: true, data: plans });
   } catch (error: any) {
+    console.error('❌ Plans GET error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const { name, price, features } = await request.json();
+    const { name, description, price, billingCycle, features } = await request.json();
+
+    // Convert features array to JSON string
+    const featuresJson = JSON.stringify(features);
+
     const pool = await connectDB();
     const result = await pool.request()
       .input('name', sql.NVarChar, name)
+      .input('description', sql.NVarChar, description || null)
       .input('price', sql.Decimal(10, 2), price)
-      .input('features', sql.NVarChar, features)
+      .input('billingCycle', sql.NVarChar, billingCycle)
+      .input('features', sql.NVarChar, featuresJson)
       .query(`
-        INSERT INTO Plans (name, price, features)
+        INSERT INTO Plans (name, description, price, billingCycle, features)
         OUTPUT INSERTED.*
-        VALUES (@name, @price, @features)
+        VALUES (@name, @description, @price, @billingCycle, @features)
       `);
 
     return NextResponse.json({ success: true, data: result.recordset[0] }, { status: 201 });

@@ -66,9 +66,9 @@ export default function SalesPage() {
     try {
       const [stockData, cats, subs, sales] = await Promise.all([
         apiClient.getStock(user.id),
-        apiClient.getCategories(),
-        apiClient.getSubCategories(),
-        apiClient.getSales(),
+        apiClient.getCategories(user.id),
+        apiClient.getSubCategories(user.id),
+        apiClient.getSales(user.id),
       ]) as [StockItem[], ScrapCategory[], ScrapSubCategory[], Sale[]];
 
       // Only show stock items with available quantity
@@ -98,6 +98,13 @@ export default function SalesPage() {
     return stock.find(s => s.id === stockId);
   };
 
+  const getRemainingStock = (stockId: number): number => {
+    const stockItem = getStockItemDetails(stockId);
+    if (!stockItem) return 0;
+    const quantityInCart = cart.filter(item => item.stockItemId === stockId).reduce((sum, item) => sum + item.quantity, 0);
+    return stockItem.availableStock - quantityInCart;
+  };
+
   const handleAddToCart = () => {
     if (!selectedStock || !quantity || !rate) return;
 
@@ -105,8 +112,9 @@ export default function SalesPage() {
     if (!stockItem) return;
 
     const qty = parseFloat(quantity);
-    if (qty > stockItem.availableStock) {
-      toast.error(`Not enough stock available. Max: ${stockItem.availableStock} ${stockItem.unit}`);
+    const remaining = getRemainingStock(parseInt(selectedStock));
+    if (qty > remaining) {
+      toast.error(`Not enough stock. Remaining: ${remaining} ${stockItem.unit}`);
       return;
     }
 
@@ -470,6 +478,25 @@ export default function SalesPage() {
                         <p className="text-sm text-gray-600">
                           Available: <span className="font-semibold">{selectedStockItem.availableStock} {selectedStockItem.unit}</span> |
                           Avg Rate: <span className="font-semibold">Rs.{selectedStockItem.averageRate}</span>
+                          {(() => {
+                            const remaining = getRemainingStock(selectedStockItem.id);
+                            const inCart = selectedStockItem.availableStock - remaining;
+                            return (
+                              <>
+                                {inCart > 0 && (
+                                  <span className="ml-2 text-orange-600">
+                                    | In Cart: <span className="font-semibold">{inCart}</span>
+                                    {' '}→ Remaining: <span className="font-semibold">{remaining} {selectedStockItem.unit}</span>
+                                  </span>
+                                )}
+                                {quantity && parseFloat(quantity) > 0 && (
+                                  <span className="ml-2 text-blue-600">
+                                    | After This: <span className="font-semibold">{(remaining - parseFloat(quantity)).toFixed(2)} {selectedStockItem.unit}</span>
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
                         </p>
                       </div>
                     )}

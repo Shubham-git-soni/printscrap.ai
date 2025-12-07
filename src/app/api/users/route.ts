@@ -37,28 +37,42 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const { id, companyName, email, contactNumber, address } = await request.json();
+    const { id, companyName, email, contactNumber, address, isActive, isVerified } = await request.json();
 
     if (!id) {
-      return NextResponse.json(
-        { success: false, message: 'User ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, message: 'User ID is required' }, { status: 400 });
     }
 
     const pool = await connectDB();
+
+    // Fetch current user for merging
+    const currentUser = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT * FROM Users WHERE id = @id');
+
+    if (currentUser.recordset.length === 0) {
+      return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+    }
+
+    const user = currentUser.recordset[0];
+
+    // Merge updates with existing data
     const result = await pool.request()
       .input('id', sql.Int, id)
-      .input('companyName', sql.NVarChar, companyName)
-      .input('email', sql.NVarChar, email)
-      .input('contactNumber', sql.NVarChar, contactNumber || null)
-      .input('address', sql.NVarChar, address || null)
+      .input('companyName', sql.NVarChar, companyName ?? user.companyName)
+      .input('email', sql.NVarChar, email ?? user.email)
+      .input('contactNumber', sql.NVarChar, (contactNumber ?? user.contactNumber) || null)
+      .input('address', sql.NVarChar, (address ?? user.address) || null)
+      .input('isActive', sql.Bit, isActive ?? user.isActive)
+      .input('isVerified', sql.Bit, isVerified ?? user.isVerified)
       .query(`
         UPDATE Users
         SET companyName = @companyName,
             email = @email,
             contactNumber = @contactNumber,
-            address = @address
+            address = @address,
+            isActive = @isActive,
+            isVerified = @isVerified
         OUTPUT INSERTED.id, INSERTED.email, INSERTED.role, INSERTED.companyName,
                INSERTED.contactNumber, INSERTED.address, INSERTED.isActive,
                INSERTED.isVerified, INSERTED.subscriptionId, INSERTED.createdAt

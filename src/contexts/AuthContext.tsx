@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<string | null>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<string | null> => {
     try {
       // Call real API
       const response = await fetch('/api/auth/login', {
@@ -55,12 +55,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           router.push('/client/dashboard');
         }
-        return true;
+        return null; // No error
       }
-      return false;
+
+      // Return actual error message from API
+      return data.message || 'Login failed. Please try again.';
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      return 'Network error. Please check your connection.';
     }
   };
 

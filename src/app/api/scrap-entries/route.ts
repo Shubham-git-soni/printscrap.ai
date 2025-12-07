@@ -2,38 +2,48 @@ import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'userId is required' }, { status: 400 });
+    }
+
     const pool = await connectDB();
-    const result = await pool.request().query(`
-      SELECT
-        se.id,
-        se.entryType,
-        se.categoryId,
-        se.subCategoryId,
-        se.departmentId,
-        se.machineId,
-        se.quantity,
-        se.unit,
-        se.rate,
-        se.totalValue,
-        se.jobNumber,
-        se.remarks,
-        se.createdBy,
-        se.createdAt,
-        c.name as categoryName,
-        sc.name as subCategoryName,
-        d.name as departmentName,
-        m.name as machineName,
-        usr.companyName as userName
-      FROM ScrapEntries se
-      LEFT JOIN Categories c ON se.categoryId = c.id
-      LEFT JOIN SubCategories sc ON se.subCategoryId = sc.id
-      LEFT JOIN Departments d ON se.departmentId = d.id
-      LEFT JOIN Machines m ON se.machineId = m.id
-      LEFT JOIN Users usr ON se.createdBy = usr.id
-      ORDER BY se.createdAt DESC
-    `);
+    const result = await pool.request()
+      .input('userId', sql.Int, parseInt(userId))
+      .query(`
+        SELECT
+          se.id,
+          se.entryType,
+          se.categoryId,
+          se.subCategoryId,
+          se.departmentId,
+          se.machineId,
+          se.quantity,
+          se.unit,
+          se.rate,
+          se.totalValue,
+          se.jobNumber,
+          se.remarks,
+          se.createdBy,
+          se.createdAt,
+          c.name as categoryName,
+          sc.name as subCategoryName,
+          d.name as departmentName,
+          m.name as machineName,
+          usr.companyName as userName
+        FROM ScrapEntries se
+        LEFT JOIN Categories c ON se.categoryId = c.id
+        LEFT JOIN SubCategories sc ON se.subCategoryId = sc.id
+        LEFT JOIN Departments d ON se.departmentId = d.id
+        LEFT JOIN Machines m ON se.machineId = m.id
+        LEFT JOIN Users usr ON se.createdBy = usr.id
+        WHERE se.createdBy = @userId
+        ORDER BY se.createdAt DESC
+      `);
 
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {

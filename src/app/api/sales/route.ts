@@ -2,26 +2,36 @@ import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ success: false, message: 'userId is required' }, { status: 400 });
+    }
+
     const pool = await connectDB();
 
-    // Get all sales
-    const salesResult = await pool.request().query(`
-      SELECT
-        s.id,
-        s.invoiceNumber,
-        s.buyerName,
-        s.buyerContact,
-        s.totalAmount,
-        s.remarks,
-        s.saleDate,
-        s.createdBy,
-        usr.companyName as userName
-      FROM Sales s
-      LEFT JOIN Users usr ON s.createdBy = usr.id
-      ORDER BY s.saleDate DESC, s.id DESC
-    `);
+    // Get sales for this user only
+    const salesResult = await pool.request()
+      .input('userId', sql.Int, parseInt(userId))
+      .query(`
+        SELECT
+          s.id,
+          s.invoiceNumber,
+          s.buyerName,
+          s.buyerContact,
+          s.totalAmount,
+          s.remarks,
+          s.saleDate,
+          s.createdBy,
+          usr.companyName as userName
+        FROM Sales s
+        LEFT JOIN Users usr ON s.createdBy = usr.id
+        WHERE s.createdBy = @userId
+        ORDER BY s.saleDate DESC, s.id DESC
+      `);
 
     // Get all sale items
     const itemsResult = await pool.request().query(`
