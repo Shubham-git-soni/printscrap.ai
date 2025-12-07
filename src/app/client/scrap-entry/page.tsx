@@ -12,6 +12,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiClient } from '@/lib/api-client';
+import { showSuccess, showError } from '@/lib/toast';
 import { ScrapCategory, ScrapSubCategory, ScrapEntry, Department, Machine, Unit } from '@/lib/types';
 import { Plus, FileText, Package, Calendar } from 'lucide-react';
 

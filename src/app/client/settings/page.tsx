@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiClient } from '@/lib/api-client';
+import { showSuccess, showError } from '@/lib/toast';
 import { Subscription, Plan } from '@/lib/types';
 import { Settings as SettingsIcon, User as UserIcon, CreditCard, CheckCircle, Mail, Phone, AlertCircle } from 'lucide-react';
 
@@ -301,9 +302,9 @@ export default function SettingsPage() {
                         <div>
                           <p className="text-sm text-gray-600">Status</p>
                           <span className={`inline-flex px-3 py-1 mt-1 rounded-full text-sm font-medium ${subscription.status === 'active' ? 'bg-green-100 text-green-700' :
-                              subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                                subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                  'bg-yellow-100 text-yellow-700'
+                            subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                              subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                'bg-yellow-100 text-yellow-700'
                             }`}>
                             {subscription.status}
                           </span>
@@ -516,8 +517,8 @@ export default function SettingsPage() {
                     <Phone className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
                     <div>
                       <p className="font-semibold text-gray-900">Call Us</p>
-                      <a href="tel:+919876543210" className="text-green-600 hover:underline mt-1 block">
-                        +91 98765 43210
+                      <a href="tel:+918269598608" className="text-green-600 hover:underline mt-1 block">
+                        +91 82695 98608
                       </a>
                     </div>
                   </div>

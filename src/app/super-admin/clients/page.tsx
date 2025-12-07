@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ViewToggle } from '@/components/ui/view-toggle';
 import { apiClient } from '@/lib/api-client';
+import { showSuccess, showError } from '@/lib/toast';
 import { User } from '@/lib/types';
 import { Users, Search, CheckCircle, XCircle, Mail } from 'lucide-react';
 
@@ -15,6 +17,7 @@ export default function ClientsPage() {
   const { user } = useAuth();
   const [clients, setClients] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'grid' | 'card'>('grid');
 
   useEffect(() => {
     loadClients();
@@ -34,8 +37,10 @@ export default function ClientsPage() {
     try {
       await apiClient.updateUser(clientId, { isActive: !currentStatus });
       await loadClients();
+      showSuccess(currentStatus ? 'Client deactivated successfully' : 'Client activated successfully');
     } catch (error) {
       console.error('Error toggling active status:', error);
+      showError('Failed to update client status');
     }
   };
 
@@ -43,8 +48,10 @@ export default function ClientsPage() {
     try {
       await apiClient.updateUser(clientId, { isVerified: !currentStatus });
       await loadClients();
+      showSuccess(currentStatus ? 'Client unverified' : 'Client verified successfully');
     } catch (error) {
       console.error('Error toggling verified status:', error);
+      showError('Failed to update verified status');
     }
   };
 
@@ -125,10 +132,13 @@ export default function ClientsPage() {
         {/* Clients Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              All Clients ({filteredClients.length})
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                All Clients ({filteredClients.length})
+              </CardTitle>
+              <ViewToggle view={viewMode} onViewChange={setViewMode} />
+            </div>
           </CardHeader>
           <CardContent>
             {filteredClients.length === 0 ? (
@@ -139,67 +149,153 @@ export default function ClientsPage() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Company Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Registered</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Email Verified</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredClients.map(client => (
-                      <TableRow key={client.id}>
-                        <TableCell className="font-medium">{client.companyName}</TableCell>
-                        <TableCell>{client.email}</TableCell>
-                        <TableCell>
-                          {new Date(client.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isActive
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
-                            }`}>
-                            {client.isActive ? (
-                              <>
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                Active
-                              </>
-                            ) : (
-                              <>
-                                <XCircle className="h-3 w-3 mr-1" />
-                                Inactive
-                              </>
-                            )}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isVerified
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
-                            }`}>
-                            {client.isVerified ? (
-                              <>
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                Verified
-                              </>
-                            ) : (
-                              <>
-                                <Mail className="h-3 w-3 mr-1" />
-                                Pending
-                              </>
-                            )}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
+              <>
+                {/* Grid/Table View */}
+                <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
+                  <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-white z-10">
+                        <TableRow>
+                          <TableHead>Company Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Registered</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Email Verified</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredClients.map(client => (
+                          <TableRow key={client.id}>
+                            <TableCell className="font-medium">{client.companyName}</TableCell>
+                            <TableCell>{client.email}</TableCell>
+                            <TableCell>
+                              {new Date(client.createdAt).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isActive
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-700'
+                                }`}>
+                                {client.isActive ? (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Active
+                                  </>
+                                ) : (
+                                  <>
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Inactive
+                                  </>
+                                )}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isVerified
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                {client.isVerified ? (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Verified
+                                  </>
+                                ) : (
+                                  <>
+                                    <Mail className="h-3 w-3 mr-1" />
+                                    Pending
+                                  </>
+                                )}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant={client.isActive ? 'destructive' : 'default'}
+                                  size="sm"
+                                  onClick={() => handleToggleActive(client.id, client.isActive)}
+                                >
+                                  {client.isActive ? 'Deactivate' : 'Activate'}
+                                </Button>
+                                <Button
+                                  variant={client.isVerified ? 'outline' : 'default'}
+                                  size="sm"
+                                  onClick={() => handleToggleVerified(client.id, client.isVerified)}
+                                >
+                                  {client.isVerified ? 'Unverify' : 'Verify'}
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+
+                {/* Card View */}
+                <div className={`${viewMode === 'card' ? 'block' : 'hidden'} space-y-4 max-h-[600px] overflow-y-auto`}>
+                  {filteredClients.map(client => (
+                    <Card key={client.id}>
+                      <CardContent className="pt-6">
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm text-gray-600">Company</p>
+                            <p className="font-semibold">{client.companyName}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Email</p>
+                            <p className="text-sm">{client.email}</p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-600">Status</p>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isActive
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-red-100 text-red-700'
+                                }`}>
+                                {client.isActive ? (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Active
+                                  </>
+                                ) : (
+                                  <>
+                                    <XCircle className="h-3 w-3 mr-1" />
+                                    Inactive
+                                  </>
+                                )}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Email</p>
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isVerified
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                {client.isVerified ? (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Verified
+                                  </>
+                                ) : (
+                                  <>
+                                    <Mail className="h-3 w-3 mr-1" />
+                                    Pending
+                                  </>
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600 mb-2">Registered</p>
+                            <p className="text-sm">{new Date(client.createdAt).toLocaleDateString()}</p>
+                          </div>
+                          <div className="flex gap-2 pt-2">
                             <Button
                               variant={client.isActive ? 'destructive' : 'default'}
                               size="sm"
+                              className="flex-1"
                               onClick={() => handleToggleActive(client.id, client.isActive)}
                             >
                               {client.isActive ? 'Deactivate' : 'Activate'}
@@ -207,17 +303,18 @@ export default function ClientsPage() {
                             <Button
                               variant={client.isVerified ? 'outline' : 'default'}
                               size="sm"
+                              className="flex-1"
                               onClick={() => handleToggleVerified(client.id, client.isVerified)}
                             >
                               {client.isVerified ? 'Unverify' : 'Verify'}
                             </Button>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

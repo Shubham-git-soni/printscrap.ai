@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { apiClient } from '@/lib/api-client';
 import { ScrapCategory, ScrapSubCategory, Unit, Department, Machine } from '@/lib/types';
 import { Plus, Trash2, Pencil } from 'lucide-react';
-import { confirmDelete } from '@/lib/toast';
+import { confirmDelete, showSuccess, showError } from '@/lib/toast';
 
 export default function MastersPage() {
   const { user } = useAuth();

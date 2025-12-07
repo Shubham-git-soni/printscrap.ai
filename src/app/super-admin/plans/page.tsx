@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { apiClient } from '@/lib/api-client';
 import { Plan } from '@/lib/types';
 import { CreditCard, Plus, Trash2, CheckCircle } from 'lucide-react';
-import { confirmDelete } from '@/lib/toast';
+import { confirmDelete, showSuccess, showError } from '@/lib/toast';
 
 export default function PlansPage() {
   const { user } = useAuth();
@@ -36,6 +36,7 @@ export default function PlansPage() {
       setPlans(allPlans);
     } catch (error) {
       console.error('Error loading plans:', error);
+      showError('Failed to load plans');
     }
   };
 
@@ -66,8 +67,10 @@ export default function PlansPage() {
       });
       setShowAddForm(false);
       await loadPlans();
+      showSuccess('Plan created successfully!');
     } catch (error) {
       console.error('Error creating plan:', error);
+      showError('Failed to create plan');
     }
   };
 
@@ -76,8 +79,10 @@ export default function PlansPage() {
       try {
         await apiClient.deletePlan(id);
         await loadPlans();
+        showSuccess('Plan deleted successfully!');
       } catch (error) {
         console.error('Error deleting plan:', error);
+        showError('Failed to delete plan');
       }
     });
   };
@@ -90,7 +95,10 @@ export default function PlansPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Plan Management</h1>
             <p className="text-sm md:text-base text-gray-600 mt-1">Create and manage subscription plans</p>
           </div>
-          <Button onClick={() => setShowAddForm(!showAddForm)} className="w-full md:w-auto">
+          <Button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className={`w-full md:w-auto ${showAddForm ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700'}`}
+          >
             <Plus className="h-4 w-4 mr-2" />
             {showAddForm ? 'Cancel' : 'Add New Plan'}
           </Button>
@@ -167,7 +175,7 @@ export default function PlansPage() {
                 </div>
 
                 <div className="pt-4">
-                  <Button type="submit">
+                  <Button type="submit" className="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700">
                     <Plus className="h-4 w-4 mr-2" />
                     Create Plan
                   </Button>
@@ -193,14 +201,16 @@ export default function PlansPage() {
                       <CardTitle className="text-xl">{plan.name}</CardTitle>
                       <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(plan.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(plan.id)}
+                        className="bg-rose-100 hover:bg-rose-200 text-rose-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   <div className="mt-4">
                     <div className="flex items-baseline gap-2">

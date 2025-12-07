@@ -183,11 +183,10 @@ export function TrialExpiredModal({ plans, onClose }: TrialExpiredModalProps) {
                 return (
                   <Card
                     key={plan.id}
-                    className={`relative border-2 ${
-                      isRecommended
-                        ? 'border-indigo-400 shadow-lg shadow-indigo-500/20 scale-[1.02]'
-                        : `${color.border} shadow-md`
-                    } hover:shadow-xl transition-all duration-300 bg-white overflow-hidden`}
+                    className={`relative border-2 ${isRecommended
+                      ? 'border-indigo-400 shadow-lg shadow-indigo-500/20 scale-[1.02]'
+                      : `${color.border} shadow-md`
+                      } hover:shadow-xl transition-all duration-300 bg-white overflow-hidden`}
                   >
                     {isRecommended && (
                       <div className="absolute top-0 right-0 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
@@ -227,11 +226,10 @@ export function TrialExpiredModal({ plans, onClose }: TrialExpiredModalProps) {
                       </ul>
                       <Button
                         onClick={() => setSelectedPlan(plan)}
-                        className={`w-full h-10 font-semibold text-sm shadow-md transition-all duration-300 ${
-                          isRecommended
-                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
-                            : `bg-gradient-to-r ${color.button} hover:opacity-90 text-white`
-                        }`}
+                        className={`w-full h-10 font-semibold text-sm shadow-md transition-all duration-300 ${isRecommended
+                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white'
+                          : `bg-gradient-to-r ${color.button} hover:opacity-90 text-white`
+                          }`}
                       >
                         <Send className="h-4 w-4 mr-2" />
                         Request This Plan
@@ -270,7 +268,7 @@ export function TrialExpiredModal({ plans, onClose }: TrialExpiredModalProps) {
                 </a>
 
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+918269598608"
                   className="flex items-center gap-3 bg-white p-3 rounded-lg border-2 border-green-200 hover:shadow-md hover:border-green-400 transition-all duration-300 group"
                 >
                   <div className="bg-gradient-to-br from-green-500 to-green-600 p-2.5 rounded-lg shadow-md group-hover:scale-110 transition-transform">
@@ -279,7 +277,7 @@ export function TrialExpiredModal({ plans, onClose }: TrialExpiredModalProps) {
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-gray-600 font-medium">Call Us</p>
                     <p className="text-green-600 font-bold text-sm hover:underline truncate">
-                      +91 98765 43210
+                      +91 82695 98608
                     </p>
                   </div>
                 </a>

@@ -102,14 +102,7 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-md border border-gray-200">
-              <p className="text-xs font-semibold text-gray-700 mb-2">Demo Credentials:</p>
-              <div className="text-xs text-gray-600 space-y-1">
-                <p><strong>Super Admin:</strong> admin@printscrap.ai / admin123</p>
-                <p><strong>Client:</strong> demo@company.com / demo123</p>
-              </div>
-            </div>
+
           </CardContent>
         </Card>
       </div>

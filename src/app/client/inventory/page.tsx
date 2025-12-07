@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiClient } from '@/lib/api-client';
+import { showError } from '@/lib/toast';
 import { StockItem, ScrapCategory, ScrapSubCategory } from '@/lib/types';
 import { Package, Search, TrendingUp, TrendingDown, IndianRupee } from 'lucide-react';
 
