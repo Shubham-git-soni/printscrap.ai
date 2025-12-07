@@ -161,31 +161,31 @@ CREATE TABLE SaleItems (
 INSERT INTO Users (email, password, role, companyName, isActive, isVerified)
 VALUES ('admin@printscrap.ai', 'admin123', 'super_admin', 'PrintScrap.ai', 1, 1);
 
--- Insert Default Plans
-INSERT INTO Plans (name, description, price, billingCycle, features)
-VALUES
-('Basic', 'Perfect for small businesses', 999.00, 'month', '["Up to 100 scrap entries/month","Basic inventory tracking","Email support","1 user account"]'),
-('Professional', 'Ideal for growing businesses', 2499.00, 'month', '["Unlimited scrap entries","Advanced inventory & analytics","Priority email & phone support","Up to 5 user accounts","Custom categories"]'),
-('Enterprise', 'For large organizations', 4999.00, 'month', '["Everything in Professional","Dedicated account manager","24/7 premium support","Unlimited user accounts","API access","Custom integrations"]');
+-- -- Insert Default Plans
+-- INSERT INTO Plans (name, description, price, billingCycle, features)
+-- VALUES
+-- ('Basic', 'Perfect for small businesses', 999.00, 'month', '["Up to 100 scrap entries/month","Basic inventory tracking","Email support","1 user account"]'),
+-- ('Professional', 'Ideal for growing businesses', 2499.00, 'month', '["Unlimited scrap entries","Advanced inventory & analytics","Priority email & phone support","Up to 5 user accounts","Custom categories"]'),
+-- ('Enterprise', 'For large organizations', 4999.00, 'month', '["Everything in Professional","Dedicated account manager","24/7 premium support","Unlimited user accounts","API access","Custom integrations"]');
 
--- Insert Default Categories
-INSERT INTO Categories (name, marketRate, unit, createdBy)
-VALUES
-('Paper', 15.50, 'Kg', 1),
-('Plastic', 12.00, 'Kg', 1),
-('Metal', 45.00, 'Kg', 1);
+-- -- Insert Default Categories
+-- INSERT INTO Categories (name, marketRate, unit, createdBy)
+-- VALUES
+-- ('Paper', 15.50, 'Kg', 1),
+-- ('Plastic', 12.00, 'Kg', 1),
+-- ('Metal', 45.00, 'Kg', 1);
 
--- Insert Default Units
-INSERT INTO Units (name, symbol, createdBy)
-VALUES
-('Kilogram', 'Kg', 1),
-('Numbers', 'Nos', 1),
-('Tons', 'Tons', 1),
-('Meters', 'm', 1);
+-- -- Insert Default Units
+-- INSERT INTO Units (name, symbol, createdBy)
+-- VALUES
+-- ('Kilogram', 'Kg', 1),
+-- ('Numbers', 'Nos', 1),
+-- ('Tons', 'Tons', 1),
+-- ('Meters', 'm', 1);
 
--- Insert Default Departments
-INSERT INTO Departments (name, description, createdBy)
-VALUES
-('Printing', 'Main printing department', 1),
-('Binding', 'Book binding section', 1),
-('Cutting', 'Paper cutting and finishing', 1);
+-- -- Insert Default Departments
+-- INSERT INTO Departments (name, description, createdBy)
+-- VALUES
+-- ('Printing', 'Main printing department', 1),
+-- ('Binding', 'Book binding section', 1),
+-- ('Cutting', 'Paper cutting and finishing', 1);

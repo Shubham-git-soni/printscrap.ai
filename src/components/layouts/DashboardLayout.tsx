@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from './Sidebar';
 import { TrialExpiredModal } from '@/components/TrialExpiredModal';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { Plan } from '@/lib/types';
 
 interface DashboardLayoutProps {
@@ -20,27 +20,37 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
   const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
-    }
-
-    if (!isLoading && user && requiredRole && user.role !== requiredRole) {
-      if (user.role === 'super_admin') {
-        router.push('/super-admin/dashboard');
-      } else {
-        router.push('/client/dashboard');
+    const checkAuth = async () => {
+      if (!isLoading && !user) {
+        router.push('/login');
+        return;
       }
-    }
 
-    // Check trial expiration for clients
-    if (!isLoading && user && user.role === 'client') {
-      const isExpired = mockApi.checkTrialExpired(user.id);
-      if (isExpired) {
-        const allPlans = mockApi.getPlans();
-        setPlans(allPlans);
-        setShowTrialExpired(true);
+      if (!isLoading && user && requiredRole && user.role !== requiredRole) {
+        if (user.role === 'super_admin') {
+          router.push('/super-admin/dashboard');
+        } else {
+          router.push('/client/dashboard');
+        }
+        return;
       }
-    }
+
+      // Check trial expiration for clients
+      if (!isLoading && user && user.role === 'client') {
+        try {
+          const trialStatus = await apiClient.checkTrialExpired(user.id);
+          if (trialStatus.isExpired) {
+            const allPlans = await apiClient.getPlans();
+            setPlans(allPlans);
+            setShowTrialExpired(true);
+          }
+        } catch (error) {
+          console.error('Error checking trial status:', error);
+        }
+      }
+    };
+
+    checkAuth();
   }, [user, isLoading, router, requiredRole]);
 
   if (isLoading || !user) {

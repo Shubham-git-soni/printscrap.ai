@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { Plan } from '@/lib/types';
 import { CreditCard, Plus, Trash2, CheckCircle } from 'lucide-react';
+import { confirmDelete } from '@/lib/toast';
 
 export default function PlansPage() {
   const { user } = useAuth();
@@ -30,7 +31,7 @@ export default function PlansPage() {
   }, []);
 
   const loadPlans = () => {
-    const allPlans = mockApi.getPlans();
+    const allPlans = apiClient.getPlans();
     setPlans(allPlans);
   };
 
@@ -42,7 +43,7 @@ export default function PlansPage() {
       .filter(f => f.trim() !== '')
       .map(f => f.trim());
 
-    mockApi.createPlan({
+    apiClient.createPlan({
       name: newPlan.name,
       description: newPlan.description,
       price: parseFloat(newPlan.price),
@@ -62,11 +63,11 @@ export default function PlansPage() {
     loadPlans();
   };
 
-  const handleDeletePlan = (planId: number) => {
-    if (confirm('Are you sure you want to delete this plan?')) {
-      mockApi.deletePlan(planId);
+  const handleDelete = (id: number) => {
+    confirmDelete('Are you sure you want to delete this plan?', () => {
+      apiClient.deletePlan(id);
       loadPlans();
-    }
+    });
   };
 
   return (
@@ -183,7 +184,7 @@ export default function PlansPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeletePlan(plan.id)}
+                      onClick={() => handleDelete(plan.id)}
                       className="text-red-500 hover:text-red-700"
                     >
                       <Trash2 className="h-4 w-4" />

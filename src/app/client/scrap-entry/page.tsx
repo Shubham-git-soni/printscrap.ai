@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { ScrapCategory, ScrapSubCategory, ScrapEntry, Department, Machine } from '@/lib/types';
 import { Plus, FileText, Package, Calendar } from 'lucide-react';
 
@@ -58,25 +58,30 @@ export default function ScrapEntryPage() {
     loadData();
   }, [user]);
 
-  const loadData = () => {
-    const cats = mockApi.getCategories();
-    const subs = mockApi.getSubCategories();
-    const entries = mockApi.getScrapEntries();
-    const depts = mockApi.getDepartments();
-    const machs = mockApi.getMachines();
+  const loadData = async () => {
+    try {
+      const [cats, subs, entries, depts, machs] = await Promise.all([
+        apiClient.getCategories(),
+        apiClient.getSubCategories(),
+        apiClient.getScrapEntries(),
+        apiClient.getDepartments(),
+        apiClient.getMachines(),
+      ]);
 
-    setCategories(cats);
-    setSubCategories(subs);
-    setDepartments(depts);
-    setMachines(machs);
+      setCategories(cats as ScrapCategory[]);
+      setSubCategories(subs as ScrapSubCategory[]);
+      setDepartments(depts as Department[]);
+      setMachines(machs as Machine[]);
 
-    // Filter entries for current user and get recent 10
-    if (user) {
-      const userEntries = entries
-        .filter(e => e.createdBy === user.id)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 10);
-      setRecentEntries(userEntries);
+      // Filter entries for current user and get recent 10
+      if (user) {
+        const userEntries = (entries as ScrapEntry[])
+          .filter((e: any) => e.userId === user.id)
+          .slice(0, 10);
+        setRecentEntries(userEntries);
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
     }
   };
 
@@ -124,7 +129,7 @@ export default function ScrapEntryPage() {
 
     const totalValue = parseFloat(jobEntry.quantity) * parseFloat(jobEntry.rate);
 
-    mockApi.createScrapEntry({
+    apiClient.createScrapEntry({
       categoryId: parseInt(jobEntry.categoryId),
       subCategoryId: jobEntry.subCategoryId ? parseInt(jobEntry.subCategoryId) : undefined,
       departmentId: parseInt(jobEntry.departmentId),
@@ -162,7 +167,7 @@ export default function ScrapEntryPage() {
 
     const totalValue = parseFloat(generalEntry.quantity) * parseFloat(generalEntry.rate);
 
-    mockApi.createScrapEntry({
+    apiClient.createScrapEntry({
       categoryId: parseInt(generalEntry.categoryId),
       subCategoryId: generalEntry.subCategoryId ? parseInt(generalEntry.subCategoryId) : undefined,
       departmentId: parseInt(generalEntry.departmentId),

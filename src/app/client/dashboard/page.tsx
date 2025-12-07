@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { IndianRupee, Package, TrendingUp, Weight } from 'lucide-react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -24,55 +24,55 @@ export default function ClientDashboard() {
   useEffect(() => {
     if (!user) return;
 
-    // Get stock data
-    const stock = mockApi.getStock(user.id);
-    const sales = mockApi.getSales();
-    const entries = mockApi.getScrapEntries();
-    const categories = mockApi.getCategories();
+    const fetchDashboardData = async () => {
+      try {
+        // Get data from API
+        const [stock, sales, categories] = await Promise.all([
+          apiClient.getStock(user.id),
+          apiClient.getSales(),
+          apiClient.getCategories(),
+        ]);
 
-    // Calculate total scrap value
-    const totalValue = stock.reduce((sum, item) => sum + item.totalValue, 0);
+        // Calculate total scrap value
+        const totalValue = stock.reduce((sum: number, item: any) => sum + (item.availableWeight * item.marketRate || 0), 0);
 
-    // Calculate total revenue
-    const userSales = sales.filter(s => s.createdBy === user.id);
-    const totalRevenue = userSales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+        // Calculate total revenue
+        const totalRevenue = sales.reduce((sum: number, sale: any) => sum + sale.totalAmount, 0);
 
-    // Calculate total stock weight
-    const totalWeight = stock.reduce((sum, item) => sum + item.availableStock, 0);
+        // Calculate total stock weight
+        const totalWeight = stock.reduce((sum: number, item: any) => sum + item.availableWeight, 0);
 
-    // Count unique stock items
-    const stockCount = stock.length;
+        // Count unique stock items
+        const stockCount = stock.length;
 
-    setStats({
-      totalScrapValue: totalValue,
-      totalRevenue,
-      totalStockWeight: totalWeight,
-      totalStockCount: stockCount,
-    });
+        setStats({
+          totalScrapValue: totalValue,
+          totalRevenue,
+          totalStockWeight: totalWeight,
+          totalStockCount: stockCount,
+        });
 
-    // Prepare category data for pie chart
-    const catMap = new Map<number, number>();
-    stock.forEach(item => {
-      const existing = catMap.get(item.categoryId) || 0;
-      catMap.set(item.categoryId, existing + item.totalValue);
-    });
+        // Prepare category data for pie chart
+        const catData = stock.map((item: any) => ({
+          name: item.categoryName || 'Unknown',
+          value: Math.round(item.availableWeight * item.marketRate || 0),
+        }));
+        setCategoryData(catData);
 
-    const catData = Array.from(catMap.entries()).map(([catId, value]) => {
-      const cat = categories.find(c => c.id === catId);
-      return {
-        name: cat?.name || 'Unknown',
-        value: Math.round(value),
-      };
-    });
-    setCategoryData(catData);
+        // Prepare weekly volume data from recent scrap entries
+        const scrapEntries = await apiClient.getScrapEntries();
+        const last7Days = scrapEntries.slice(0, 7).reverse();
+        const weekData = last7Days.map((entry: any) => ({
+          day: new Date(entry.entryDate).toLocaleDateString('en-US', { weekday: 'short' }),
+          kg: entry.weight,
+        }));
+        setWeeklyData(weekData.length > 0 ? weekData : []);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      }
+    };
 
-    // Prepare weekly volume data (mock data for demo)
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const weekData = days.map((day, idx) => ({
-      day,
-      kg: Math.round(Math.random() * 100 + 50),
-    }));
-    setWeeklyData(weekData);
+    fetchDashboardData();
   }, [user]);
 
   return (
@@ -88,7 +88,7 @@ export default function ClientDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Total Scrap Value
+                Total Estimated Scrap Value
               </CardTitle>
               <IndianRupee className="h-5 w-5 text-green-600" />
             </CardHeader>

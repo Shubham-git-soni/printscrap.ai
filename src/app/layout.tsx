@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Toaster } from 'sonner';
 
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "PrintScrap.ai - Scrap Management for Printing Industry",
-  description: "Professional scrap management SaaS application for the printing industry",
+  title: "PrintScrap.ai - Scrap Management System",
+  description: "Modern scrap management solution for printing companies",
 };
 
 export default function RootLayout({
@@ -20,9 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={geist.className}>
         <AuthProvider>
           {children}
+          <Toaster position="top-right" richColors expand={false} />
         </AuthProvider>
       </body>
     </html>

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { StockItem, ScrapCategory, ScrapSubCategory } from '@/lib/types';
 import { Package, Search, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 
@@ -36,9 +36,9 @@ export default function InventoryPage() {
   const loadData = () => {
     if (!user) return;
 
-    const stockData = mockApi.getStock(user.id);
-    const cats = mockApi.getCategories();
-    const subs = mockApi.getSubCategories();
+    const stockData = apiClient.getStock(user.id);
+    const cats = apiClient.getCategories();
+    const subs = apiClient.getSubCategories();
 
     setStock(stockData);
     setCategories(cats);

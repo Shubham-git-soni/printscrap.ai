@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { Subscription, User, Plan } from '@/lib/types';
 import { CreditCard, Plus, Search } from 'lucide-react';
 
@@ -34,23 +34,36 @@ export default function SubscriptionsPage() {
     loadData();
   }, []);
 
-  const loadData = () => {
-    const users = mockApi.getUsers();
-    const allPlans = mockApi.getPlans();
-    const allSubs = mockApi.getSubscriptions();
+  const loadData = async () => {
+    try {
+      const [users, allPlans] = await Promise.all([
+        apiClient.getUsers(),
+        apiClient.getPlans(),
+      ]);
 
-    const clientUsers = users.filter(u => u.role === 'client');
-    setClients(clientUsers);
-    setPlans(allPlans);
+      const clientUsers = (users as any[]).filter((u: any) => u.role === 'client');
+      setClients(clientUsers as User[]);
+      setPlans(allPlans as Plan[]);
 
-    // Enhance subscriptions with user and plan info
-    const enhancedSubs = allSubs.map(sub => ({
-      ...sub,
-      user: users.find(u => u.subscriptionId === sub.id),
-      plan: allPlans.find(p => p.id === sub.planId),
-    }));
+      // Build subscriptions from user data (users already include subscription info)
+      const enhancedSubs = clientUsers
+        .filter((u: any) => u.subscriptionId)
+        .map((user: any) => ({
+          id: user.subscriptionId,
+          userId: user.id,
+          planId: 0,
+          status: user.subscriptionStatus || 'active',
+          startDate: user.createdAt,
+          endDate: user.subscriptionEndDate,
+          autoRenew: false,
+          user: user,
+          plan: (allPlans as any[]).find((p: any) => p.name === user.planName),
+        }));
 
-    setSubscriptions(enhancedSubs);
+      setSubscriptions(enhancedSubs);
+    } catch (error) {
+      console.error('Error loading subscriptions data:', error);
+    }
   };
 
   const handleAddSubscription = (e: React.FormEvent) => {
@@ -59,36 +72,17 @@ export default function SubscriptionsPage() {
     const selectedPlan = plans.find(p => p.id === parseInt(newSubscription.planId));
     if (!selectedPlan) return;
 
-    const subscription = mockApi.createSubscription({
-      userId: parseInt(newSubscription.userId),
-      planId: parseInt(newSubscription.planId),
-      startDate: newSubscription.startDate,
-      endDate: newSubscription.endDate,
-      status: newSubscription.status,
-      autoRenew: newSubscription.autoRenew,
-    });
+    // Create subscription API not implemented yet
+    console.warn('Create subscription API not implemented');
+    alert('Subscription management features are not yet implemented in the backend.');
 
-    // Update user's subscriptionId
-    mockApi.updateUser(parseInt(newSubscription.userId), {
-      subscriptionId: subscription.id,
-    });
-
-    // Reset form
-    setNewSubscription({
-      userId: '',
-      planId: '',
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: '',
-      status: 'active',
-      autoRenew: true,
-    });
     setShowAddForm(false);
-    loadData();
   };
 
-  const handleUpdateStatus = (subId: number, newStatus: 'active' | 'trial' | 'expired' | 'cancelled') => {
-    mockApi.updateSubscription(subId, { status: newStatus });
-    loadData();
+  const handleUpdateStatus = (_subId: number, _newStatus: 'active' | 'trial' | 'expired' | 'cancelled') => {
+    // Update subscription API not implemented yet
+    console.warn('Update subscription API not implemented');
+    alert('Subscription status update is not yet implemented in the backend.');
   };
 
   const filteredSubscriptions = subscriptions.filter(sub => {

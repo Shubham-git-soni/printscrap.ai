@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { Subscription, Plan } from '@/lib/types';
 import { Settings as SettingsIcon, User as UserIcon, CreditCard, CheckCircle } from 'lucide-react';
 
@@ -28,29 +28,41 @@ export default function SettingsPage() {
   const [plan, setPlan] = useState<Plan | null>(null);
 
   useEffect(() => {
-    if (user) {
-      setCompanyName(user.companyName || '');
-      setEmail(user.email);
-      setContactNumber(user.contactNumber || '');
-      setAddress(user.address || '');
+    const loadData = async () => {
+      if (user) {
+        setCompanyName(user.companyName || '');
+        setEmail(user.email);
+        setContactNumber(user.contactNumber || '');
+        setAddress(user.address || '');
 
-      // Load subscription
-      if (user.subscriptionId) {
-        const sub = mockApi.getSubscriptions().find(s => s.id === user.subscriptionId);
-        if (sub) {
-          setSubscription(sub);
-          const p = mockApi.getPlans().find(pl => pl.id === sub.planId);
-          setPlan(p || null);
+        // Load subscription
+        if (user.subscriptionId) {
+          try {
+            const [sub, plans] = await Promise.all([
+              apiClient.getSubscription(user.id),
+              apiClient.getPlans(),
+            ]);
+
+            if (sub) {
+              setSubscription(sub);
+              const p = plans.find((pl: any) => pl.id === sub.planId);
+              setPlan(p || null);
+            }
+          } catch (error) {
+            console.error('Error loading subscription:', error);
+          }
         }
       }
-    }
+    };
+
+    loadData();
   }, [user]);
 
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    const updatedUser = mockApi.updateUser(user.id, {
+    const updatedUser = apiClient.updateUser(user.id, {
       companyName,
       email,
       contactNumber,

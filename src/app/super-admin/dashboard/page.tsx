@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { User, Subscription, Plan } from '@/lib/types';
 import { Users, CreditCard, TrendingUp, IndianRupee, CheckCircle, XCircle } from 'lucide-react';
 
@@ -23,47 +23,59 @@ export default function SuperAdminDashboard() {
     loadData();
   }, []);
 
-  const loadData = () => {
-    const users = mockApi.getUsers();
-    const subscriptions = mockApi.getSubscriptions();
-    const plans = mockApi.getPlans();
+  const loadData = async () => {
+    try {
+      const [users, plans] = await Promise.all([
+        apiClient.getUsers(),
+        apiClient.getPlans(),
+      ]);
 
-    // Filter only clients
-    const clients = users.filter(u => u.role === 'client');
-    const activeClients = clients.filter(u => u.isActive);
+      // Filter only clients
+      const clients = users.filter((u: any) => u.role === 'client');
+      const activeClients = clients.filter((u: any) => u.isActive);
 
-    // Active subscriptions
-    const activeSubs = subscriptions.filter(s => s.status === 'active');
+      // Active subscriptions (from user data which includes subscription info)
+      const activeSubs = clients.filter((u: any) => u.subscriptionStatus === 'active');
 
-    // Calculate total revenue (sum of all active subscriptions)
-    const totalRevenue = activeSubs.reduce((sum, sub) => {
-      const plan = plans.find(p => p.id === sub.planId);
-      return sum + (plan?.price || 0);
-    }, 0);
+      // Calculate total revenue (sum of all active subscriptions)
+      const totalRevenue = activeSubs.reduce((sum: number, user: any) => {
+        const plan = plans.find((p: any) => p.name === user.planName);
+        return sum + (plan?.price || 0);
+      }, 0);
 
-    setStats({
-      totalClients: clients.length,
-      activeClients: activeClients.length,
-      totalRevenue,
-      activeSubscriptions: activeSubs.length,
-    });
+      setStats({
+        totalClients: clients.length,
+        activeClients: activeClients.length,
+        totalRevenue,
+        activeSubscriptions: activeSubs.length,
+      });
 
-    // Recent clients (last 5)
-    const recent = clients
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 5);
-    setRecentClients(recent);
+      // Recent clients (last 5)
+      const recent = clients
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5);
+      setRecentClients(recent);
 
-    // Recent subscriptions with user and plan info
-    const recentSubs = subscriptions
-      .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
-      .slice(0, 5)
-      .map(sub => ({
-        ...sub,
-        user: users.find(u => u.subscriptionId === sub.id),
-        plan: plans.find(p => p.id === sub.planId),
+      // Recent subscriptions with user and plan info (from users data)
+      const recentSubs = clients
+        .filter((u: any) => u.subscriptionEndDate)
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 5)
+      .map((user: any) => ({
+        id: user.subscriptionId,
+        userId: user.id,
+        planId: 0,
+        status: user.subscriptionStatus,
+        startDate: user.createdAt,
+        endDate: user.subscriptionEndDate,
+        autoRenew: false,
+        user: user,
+        plan: plans.find((p: any) => p.name === user.planName),
       }));
-    setRecentSubscriptions(recentSubs);
+      setRecentSubscriptions(recentSubs);
+    } catch (error) {
+      console.error('Error loading super admin dashboard data:', error);
+    }
   };
 
   return (

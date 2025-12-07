@@ -9,9 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { ScrapCategory, ScrapSubCategory, Unit, Department, Machine } from '@/lib/types';
 import { Plus, Trash2, Pencil } from 'lucide-react';
+import { confirmDelete } from '@/lib/toast';
 
 export default function MastersPage() {
   const { user } = useAuth();
@@ -67,38 +68,52 @@ export default function MastersPage() {
     loadData();
   }, []);
 
-  const loadData = () => {
-    setCategories(mockApi.getCategories());
-    setSubCategories(mockApi.getSubCategories());
-    setUnits(mockApi.getUnits());
-    setDepartments(mockApi.getDepartments());
-    setMachines(mockApi.getMachines());
+  const loadData = async () => {
+    try {
+      const [cats, subCats, unitsData, depts, machs] = await Promise.all([
+        apiClient.getCategories(),
+        apiClient.getSubCategories(),
+        apiClient.getUnits(),
+        apiClient.getDepartments(),
+        apiClient.getMachines(),
+      ]);
+      setCategories(cats as ScrapCategory[]);
+      setSubCategories(subCats as ScrapSubCategory[]);
+      setUnits(unitsData as Unit[]);
+      setDepartments(depts as Department[]);
+      setMachines(machs as Machine[]);
+    } catch (error) {
+      console.error('Error loading master data:', error);
+    }
   };
 
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (editingCategoryId) {
-      // Update existing category
-      mockApi.updateCategory(editingCategoryId, {
-        name: newCategory.name,
-        marketRate: parseFloat(newCategory.marketRate),
-        unit: newCategory.unit,
-      });
-      setEditingCategoryId(null);
-    } else {
-      // Create new category
-      mockApi.createCategory({
-        name: newCategory.name,
-        marketRate: parseFloat(newCategory.marketRate),
-        unit: newCategory.unit,
-        createdBy: user.id,
-      });
-    }
+    try {
+      if (editingCategoryId) {
+        // Update existing category
+        await apiClient.updateCategory(editingCategoryId, {
+          name: newCategory.name,
+          marketRate: parseFloat(newCategory.marketRate),
+          unit: newCategory.unit,
+        });
+        setEditingCategoryId(null);
+      } else {
+        // Create new category
+        await apiClient.createCategory({
+          name: newCategory.name,
+          marketRate: parseFloat(newCategory.marketRate),
+          unit: newCategory.unit,
+        });
+      }
 
-    setNewCategory({ name: '', marketRate: '', unit: 'Kg' });
-    loadData();
+      setNewCategory({ name: '', marketRate: '', unit: 'Kg' });
+      await loadData();
+    } catch (error) {
+      console.error('Error saving category:', error);
+    }
   };
 
   const handleEditCategory = (category: ScrapCategory) => {
@@ -116,48 +131,45 @@ export default function MastersPage() {
   };
 
   const handleDeleteCategory = (id: number) => {
-    if (confirm('Are you sure you want to delete this category?')) {
-      mockApi.deleteCategory(id);
-      loadData();
-    }
+    confirmDelete('Are you sure you want to delete this category?', async () => {
+      try {
+        await apiClient.deleteCategory(id);
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting category:', error);
+      }
+    });
   };
 
-  const handleAddSubCategory = (e: React.FormEvent) => {
+  const handleAddSubCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (editingSubCategoryId) {
-      // Update existing sub-category
-      mockApi.updateSubCategory(editingSubCategoryId, {
-        categoryId: parseInt(newSubCategory.categoryId),
-        name: newSubCategory.name,
-        size: newSubCategory.size,
-        unit: newSubCategory.unit,
-        remarks: newSubCategory.remarks,
-        attributes: { size: newSubCategory.size },
-      });
-      setEditingSubCategoryId(null);
-    } else {
-      // Create new sub-category
-      mockApi.createSubCategory({
-        categoryId: parseInt(newSubCategory.categoryId),
-        name: newSubCategory.name,
-        size: newSubCategory.size,
-        unit: newSubCategory.unit,
-        remarks: newSubCategory.remarks,
-        attributes: { size: newSubCategory.size },
-        createdBy: user.id,
-      });
-    }
+    try {
+      if (editingSubCategoryId) {
+        // Update not implemented yet - delete and recreate
+        console.warn('Update subcategory not implemented');
+        setEditingSubCategoryId(null);
+        return;
+      } else {
+        // Create new sub-category - API only needs categoryId and name
+        await apiClient.createSubCategory({
+          categoryId: parseInt(newSubCategory.categoryId),
+          name: newSubCategory.name,
+        });
+      }
 
-    setNewSubCategory({
-      categoryId: '',
-      name: '',
-      size: '',
-      unit: 'Kg',
-      remarks: '',
-    });
-    loadData();
+      setNewSubCategory({
+        categoryId: '',
+        name: '',
+        size: '',
+        unit: 'Kg',
+        remarks: '',
+      });
+      await loadData();
+    } catch (error) {
+      console.error('Error saving subcategory:', error);
+    }
   };
 
   const handleEditSubCategory = (subCategory: ScrapSubCategory) => {
@@ -183,35 +195,40 @@ export default function MastersPage() {
   };
 
   const handleDeleteSubCategory = (id: number) => {
-    if (confirm('Are you sure you want to delete this sub-category?')) {
-      mockApi.deleteSubCategory(id);
-      loadData();
-    }
+    confirmDelete('Are you sure you want to delete this sub-category?', async () => {
+      try {
+        await apiClient.deleteSubCategory(id);
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting subcategory:', error);
+      }
+    });
   };
 
   // Unit handlers
-  const handleAddUnit = (e: React.FormEvent) => {
+  const handleAddUnit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (editingUnitId) {
-      // Update existing unit
-      mockApi.updateUnit(editingUnitId, {
-        name: newUnit.name,
-        symbol: newUnit.symbol,
-      });
-      setEditingUnitId(null);
-    } else {
-      // Create new unit
-      mockApi.createUnit({
-        name: newUnit.name,
-        symbol: newUnit.symbol,
-        createdBy: user.id,
-      });
-    }
+    try {
+      if (editingUnitId) {
+        // Update not implemented yet
+        console.warn('Update unit not implemented');
+        setEditingUnitId(null);
+        return;
+      } else {
+        // Create new unit
+        await apiClient.createUnit({
+          name: newUnit.name,
+          symbol: newUnit.symbol,
+        });
+      }
 
-    setNewUnit({ name: '', symbol: '' });
-    loadData();
+      setNewUnit({ name: '', symbol: '' });
+      await loadData();
+    } catch (error) {
+      console.error('Error saving unit:', error);
+    }
   };
 
   const handleEditUnit = (unit: Unit) => {
@@ -228,35 +245,40 @@ export default function MastersPage() {
   };
 
   const handleDeleteUnit = (id: number) => {
-    if (confirm('Are you sure you want to delete this unit?')) {
-      mockApi.deleteUnit(id);
-      loadData();
-    }
+    confirmDelete('Are you sure you want to delete this unit?', async () => {
+      try {
+        await apiClient.deleteUnit(id);
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting unit:', error);
+      }
+    });
   };
 
   // Department handlers
-  const handleAddDepartment = (e: React.FormEvent) => {
+  const handleAddDepartment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (editingDepartmentId) {
-      // Update existing department
-      mockApi.updateDepartment(editingDepartmentId, {
-        name: newDepartment.name,
-        description: newDepartment.description,
-      });
-      setEditingDepartmentId(null);
-    } else {
-      // Create new department
-      mockApi.createDepartment({
-        name: newDepartment.name,
-        description: newDepartment.description,
-        createdBy: user.id,
-      });
-    }
+    try {
+      if (editingDepartmentId) {
+        // Update not implemented yet
+        console.warn('Update department not implemented');
+        setEditingDepartmentId(null);
+        return;
+      } else {
+        // Create new department
+        await apiClient.createDepartment({
+          name: newDepartment.name,
+          description: newDepartment.description,
+        });
+      }
 
-    setNewDepartment({ name: '', description: '' });
-    loadData();
+      setNewDepartment({ name: '', description: '' });
+      await loadData();
+    } catch (error) {
+      console.error('Error saving department:', error);
+    }
   };
 
   const handleEditDepartment = (dept: Department) => {
@@ -273,39 +295,42 @@ export default function MastersPage() {
   };
 
   const handleDeleteDepartment = (id: number) => {
-    if (confirm('Are you sure you want to delete this department?')) {
-      mockApi.deleteDepartment(id);
-      loadData();
-    }
+    confirmDelete('Are you sure you want to delete this department?', async () => {
+      try {
+        await apiClient.deleteDepartment(id);
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting department:', error);
+      }
+    });
   };
 
   // Machine handlers
-  const handleAddMachine = (e: React.FormEvent) => {
+  const handleAddMachine = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    if (editingMachineId) {
-      // Update existing machine
-      mockApi.updateMachine(editingMachineId, {
-        name: newMachine.name,
-        departmentId: parseInt(newMachine.departmentId),
-        model: newMachine.model,
-        manufacturer: newMachine.manufacturer,
-      });
-      setEditingMachineId(null);
-    } else {
-      // Create new machine
-      mockApi.createMachine({
-        name: newMachine.name,
-        departmentId: parseInt(newMachine.departmentId),
-        model: newMachine.model,
-        manufacturer: newMachine.manufacturer,
-        createdBy: user.id,
-      });
-    }
+    try {
+      if (editingMachineId) {
+        // Update not implemented yet
+        console.warn('Update machine not implemented');
+        setEditingMachineId(null);
+        return;
+      } else {
+        // Create new machine
+        await apiClient.createMachine({
+          name: newMachine.name,
+          departmentId: parseInt(newMachine.departmentId),
+          model: newMachine.model,
+          manufacturer: newMachine.manufacturer,
+        });
+      }
 
-    setNewMachine({ name: '', departmentId: '', model: '', manufacturer: '' });
-    loadData();
+      setNewMachine({ name: '', departmentId: '', model: '', manufacturer: '' });
+      await loadData();
+    } catch (error) {
+      console.error('Error saving machine:', error);
+    }
   };
 
   const handleEditMachine = (machine: Machine) => {
@@ -324,10 +349,14 @@ export default function MastersPage() {
   };
 
   const handleDeleteMachine = (id: number) => {
-    if (confirm('Are you sure you want to delete this machine?')) {
-      mockApi.deleteMachine(id);
-      loadData();
-    }
+    confirmDelete('Are you sure you want to delete this machine?', async () => {
+      try {
+        await apiClient.deleteMachine(id);
+        await loadData();
+      } catch (error) {
+        console.error('Error deleting machine:', error);
+      }
+    });
   };
 
   return (

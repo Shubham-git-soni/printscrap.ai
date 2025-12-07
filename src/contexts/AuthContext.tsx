@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '@/lib/types';
-import { mockApi } from '@/lib/mock-api';
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
@@ -21,33 +20,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    mockApi.init();
+    // Load user from localStorage
     const storedUser = localStorage.getItem('current_user');
-    if (storedUser) {
+    const authHeader = localStorage.getItem('authHeader');
+    if (storedUser && authHeader) {
       setUser(JSON.parse(storedUser));
     }
     setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const loggedInUser = mockApi.login(email, password);
-    if (loggedInUser) {
-      setUser(loggedInUser);
-      localStorage.setItem('current_user', JSON.stringify(loggedInUser));
+    try {
+      // Call real API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (loggedInUser.role === 'super_admin') {
-        router.push('/super-admin/dashboard');
-      } else {
-        router.push('/client/dashboard');
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const loggedInUser = data.data.user;
+        const authHeader = data.data.authHeader;
+
+        // Store in localStorage
+        setUser(loggedInUser);
+        localStorage.setItem('current_user', JSON.stringify(loggedInUser));
+        localStorage.setItem('authHeader', authHeader);
+
+        // Redirect based on role
+        if (loggedInUser.role === 'super_admin') {
+          router.push('/super-admin/dashboard');
+        } else {
+          router.push('/client/dashboard');
+        }
+        return true;
       }
-      return true;
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('current_user');
+    localStorage.removeItem('authHeader');
     router.push('/');
   };
 

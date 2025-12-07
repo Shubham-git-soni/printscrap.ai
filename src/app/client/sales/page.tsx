@@ -10,9 +10,10 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { StockItem, ScrapCategory, ScrapSubCategory, Sale } from '@/lib/types';
 import { ShoppingCart, Trash2, Plus, Receipt, CheckCircle, Printer } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CartItem {
   stockItemId: number;
@@ -59,26 +60,30 @@ export default function SalesPage() {
     loadData();
   }, [user]);
 
-  const loadData = () => {
+  const loadData = async () => {
     if (!user) return;
 
-    const stockData = mockApi.getStock(user.id);
-    const cats = mockApi.getCategories();
-    const subs = mockApi.getSubCategories();
-    const sales = mockApi.getSales();
+    try {
+      const [stockData, cats, subs, sales] = await Promise.all([
+        apiClient.getStock(user.id),
+        apiClient.getCategories(),
+        apiClient.getSubCategories(),
+        apiClient.getSales(),
+      ]);
 
-    // Only show stock items with available quantity
-    const availableStock = stockData.filter(s => s.availableStock > 0);
+      // Only show stock items with available quantity
+      const availableStock = stockData.filter((s: any) => s.availableWeight > 0);
 
-    setStock(availableStock);
-    setCategories(cats);
-    setSubCategories(subs);
+      setStock(availableStock);
+      setCategories(cats);
+      setSubCategories(subs);
 
-    // Filter sales for current user
-    const userSales = sales
-      .filter(s => s.createdBy === user.id)
-      .sort((a, b) => new Date(b.saleDate).getTime() - new Date(a.saleDate).getTime());
-    setSalesHistory(userSales);
+      // Sales are already filtered by user on backend
+      const userSales = sales.sort((a: any, b: any) => new Date(b.saleDate).getTime() - new Date(a.saleDate).getTime());
+      setSalesHistory(userSales);
+    } catch (error) {
+      console.error('Error loading sales data:', error);
+    }
   };
 
   const getCategoryName = (catId: number) => {
@@ -102,7 +107,7 @@ export default function SalesPage() {
 
     const qty = parseFloat(quantity);
     if (qty > stockItem.availableStock) {
-      alert(`Not enough stock available. Max: ${stockItem.availableStock} ${stockItem.unit}`);
+      toast.error(`Not enough stock available. Max: ${stockItem.availableStock} ${stockItem.unit}`);
       return;
     }
 
@@ -140,7 +145,7 @@ export default function SalesPage() {
 
   const handleCheckout = () => {
     if (!user || cart.length === 0 || !buyerName) {
-      alert('Please fill in all required fields and add items to cart');
+      toast.error('Please fill in all required fields and add items to cart');
       return;
     }
 
@@ -153,7 +158,7 @@ export default function SalesPage() {
       totalValue: item.totalValue,
     }));
 
-    const sale = mockApi.createSale({
+    const sale = apiClient.createSale({
       buyerName,
       buyerContact,
       saleItems,
@@ -364,8 +369,8 @@ export default function SalesPage() {
         <div className="flex gap-4 mb-6 border-b">
           <button
             className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'new-sale'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setActiveTab('new-sale')}
           >
@@ -374,8 +379,8 @@ export default function SalesPage() {
           </button>
           <button
             className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'history'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setActiveTab('history')}
           >

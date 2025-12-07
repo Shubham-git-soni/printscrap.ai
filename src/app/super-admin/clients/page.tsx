@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { mockApi } from '@/lib/mock-api';
+import { apiClient } from '@/lib/api-client';
 import { User } from '@/lib/types';
 import { Users, Search, CheckCircle, XCircle, Mail } from 'lucide-react';
 
@@ -22,20 +22,20 @@ export default function ClientsPage() {
   }, []);
 
   const loadClients = () => {
-    const users = mockApi.getUsers();
+    const users = apiClient.getUsers();
     const clientUsers = users.filter(u => u.role === 'client');
     setClients(clientUsers);
   };
 
   const handleToggleActive = (clientId: number, currentStatus: boolean) => {
-    const updatedUser = mockApi.updateUser(clientId, { isActive: !currentStatus });
+    const updatedUser = apiClient.updateUser(clientId, { isActive: !currentStatus });
     if (updatedUser) {
       loadClients();
     }
   };
 
   const handleToggleVerified = (clientId: number, currentStatus: boolean) => {
-    const updatedUser = mockApi.updateUser(clientId, { isVerified: !currentStatus });
+    const updatedUser = apiClient.updateUser(clientId, { isVerified: !currentStatus });
     if (updatedUser) {
       loadClients();
     }

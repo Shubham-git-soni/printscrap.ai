@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { mockApi } from '@/lib/mock-api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -51,21 +50,35 @@ export default function RegisterPage() {
     }
 
     try {
-      // Register user
-      mockApi.register({
-        email: formData.email,
-        password: formData.password,
-        role: 'client',
-        companyName: formData.companyName,
-        contactNumber: formData.contactNumber,
-        address: formData.address,
+      // Call real API
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          companyName: formData.companyName,
+          contactNumber: formData.contactNumber,
+          address: formData.address,
+        }),
       });
 
-      setSuccess(true);
-      setTimeout(() => {
-        router.push('/login');
-      }, 3000);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSuccess(true);
+        // Store auth data
+        localStorage.setItem('current_user', JSON.stringify(data.data.user));
+        localStorage.setItem('authHeader', data.data.authHeader);
+
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else {
+        setError(data.message || 'Registration failed. Please try again.');
+      }
     } catch (err) {
+      console.error('Registration error:', err);
       setError('Registration failed. Please try again.');
       setIsLoading(false);
     }
