@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         WHERE email = @email AND password = @password
       `);
 
-    await pool.close();
+
 
     if (result.recordset.length === 0) {
       return NextResponse.json(

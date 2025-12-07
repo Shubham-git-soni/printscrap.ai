@@ -28,7 +28,7 @@ export async function GET() {
       LEFT JOIN Plans p ON s.planId = p.id
       ORDER BY u.createdAt DESC
     `);
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -37,26 +37,50 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const { id, companyName, contactPerson, email, phone, address } = await request.json();
+    const { id, companyName, email, contactNumber, address } = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, message: 'User ID is required' },
+        { status: 400 }
+      );
+    }
+
     const pool = await connectDB();
     const result = await pool.request()
       .input('id', sql.Int, id)
       .input('companyName', sql.NVarChar, companyName)
-      .input('contactPerson', sql.NVarChar, contactPerson)
       .input('email', sql.NVarChar, email)
-      .input('phone', sql.NVarChar, phone)
-      .input('address', sql.NVarChar, address)
+      .input('contactNumber', sql.NVarChar, contactNumber || null)
+      .input('address', sql.NVarChar, address || null)
       .query(`
         UPDATE Users
-        SET companyName = @companyName, contactPerson = @contactPerson,
-            email = @email, phone = @phone, address = @address
-        OUTPUT INSERTED.*
+        SET companyName = @companyName,
+            email = @email,
+            contactNumber = @contactNumber,
+            address = @address
+        OUTPUT INSERTED.id, INSERTED.email, INSERTED.role, INSERTED.companyName,
+               INSERTED.contactNumber, INSERTED.address, INSERTED.isActive,
+               INSERTED.isVerified, INSERTED.subscriptionId, INSERTED.createdAt
         WHERE id = @id
       `);
-    await pool.close();
+
+
+
+    if (result.recordset.length === 0) {
+      return NextResponse.json(
+        { success: false, message: 'User not found' },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({ success: true, data: result.recordset[0] });
   } catch (error: any) {
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    console.error('❌ User update error:', error);
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -79,7 +103,7 @@ export async function DELETE(request: Request) {
         .query('DELETE FROM Users WHERE id = @id');
 
       await transaction.commit();
-      await pool.close();
+
       return NextResponse.json({ success: true });
     } catch (err) {
       await transaction.rollback();

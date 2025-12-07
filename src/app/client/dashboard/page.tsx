@@ -31,19 +31,32 @@ export default function ClientDashboard() {
           apiClient.getStock(user.id),
           apiClient.getSales(),
           apiClient.getCategories(),
-        ]);
+        ]) as [any[], any[], any[]];
 
-        // Calculate total scrap value
-        const totalValue = stock.reduce((sum: number, item: any) => sum + (item.availableWeight * item.marketRate || 0), 0);
+        console.log('📊 Dashboard Data:', { stock, sales });
+
+        // Calculate total scrap value (from stock totalValue)
+        const totalValue = stock.reduce((sum: number, item: any) => {
+          const value = parseFloat(item.totalValue) || 0;
+          return sum + value;
+        }, 0);
 
         // Calculate total revenue
-        const totalRevenue = sales.reduce((sum: number, sale: any) => sum + sale.totalAmount, 0);
+        const totalRevenue = sales.reduce((sum: number, sale: any) => {
+          const amount = parseFloat(sale.totalAmount) || 0;
+          return sum + amount;
+        }, 0);
 
         // Calculate total stock weight
-        const totalWeight = stock.reduce((sum: number, item: any) => sum + item.availableWeight, 0);
+        const totalWeight = stock.reduce((sum: number, item: any) => {
+          const weight = parseFloat(item.availableStock) || 0;
+          return sum + weight;
+        }, 0);
 
         // Count unique stock items
         const stockCount = stock.length;
+
+        console.log('📈 Stats:', { totalValue, totalRevenue, totalWeight, stockCount });
 
         setStats({
           totalScrapValue: totalValue,
@@ -52,20 +65,28 @@ export default function ClientDashboard() {
           totalStockCount: stockCount,
         });
 
-        // Prepare category data for pie chart
-        const catData = stock.map((item: any) => ({
-          name: item.categoryName || 'Unknown',
-          value: Math.round(item.availableWeight * item.marketRate || 0),
-        }));
+        // Prepare category data for pie chart (only items with value > 0)
+        const catData = stock
+          .filter((item: any) => parseFloat(item.totalValue) > 0)
+          .map((item: any) => ({
+            name: item.categoryName || 'Unknown',
+            value: Math.round(parseFloat(item.totalValue) || 0),
+          }));
+
+        console.log('🥧 Category Data:', catData);
         setCategoryData(catData);
 
         // Prepare weekly volume data from recent scrap entries
-        const scrapEntries = await apiClient.getScrapEntries();
-        const last7Days = scrapEntries.slice(0, 7).reverse();
-        const weekData = last7Days.map((entry: any) => ({
-          day: new Date(entry.entryDate).toLocaleDateString('en-US', { weekday: 'short' }),
-          kg: entry.weight,
+        const scrapEntries = await apiClient.getScrapEntries() as any[];
+        const userEntries = scrapEntries.filter((e: any) => e.createdBy === user.id);
+        const last7Days = userEntries.slice(0, 7).reverse();
+
+        const weekData = last7Days.map((entry: any, index: number) => ({
+          day: `Day ${index + 1}`,
+          kg: parseFloat(entry.quantity) || 0,
         }));
+
+        console.log('📅 Week Data:', weekData);
         setWeeklyData(weekData.length > 0 ? weekData : []);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -88,7 +109,7 @@ export default function ClientDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">
-                Total Estimated Scrap Value
+                Total Estimated Scrap
               </CardTitle>
               <IndianRupee className="h-5 w-5 text-green-600" />
             </CardHeader>
@@ -146,25 +167,32 @@ export default function ClientDashboard() {
               <CardTitle>Scrap by Category</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={categoryData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {categoryData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `Rs.${value}`} />
-                </PieChart>
-              </ResponsiveContainer>
+              {categoryData.length === 0 ? (
+                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                  No category data available
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={Math.max(300, categoryData.length * 50)}>
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => `₹${value}`} />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
 
@@ -174,16 +202,22 @@ export default function ClientDashboard() {
               <CardTitle>Weekly Volume (Kg/Day)</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="kg" fill="#3b82f6" name="Weight (Kg)" />
-                </BarChart>
-              </ResponsiveContainer>
+              {weeklyData.length === 0 ? (
+                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                  No weekly data available
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={Math.max(300, weeklyData.length * 40)}>
+                  <BarChart data={weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip formatter={(value: any) => `${value} Kg`} />
+                    <Legend />
+                    <Bar dataKey="kg" fill="#3b82f6" name="Weight (Kg)" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
         </div>

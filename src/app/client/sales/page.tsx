@@ -69,18 +69,17 @@ export default function SalesPage() {
         apiClient.getCategories(),
         apiClient.getSubCategories(),
         apiClient.getSales(),
-      ]);
+      ]) as [StockItem[], ScrapCategory[], ScrapSubCategory[], Sale[]];
 
       // Only show stock items with available quantity
-      const availableStock = stockData.filter((s: any) => s.availableWeight > 0);
+      const availableStock = stockData.filter((s: StockItem) => s.availableStock > 0);
 
       setStock(availableStock);
       setCategories(cats);
       setSubCategories(subs);
 
-      // Sales are already filtered by user on backend
-      const userSales = sales.sort((a: any, b: any) => new Date(b.saleDate).getTime() - new Date(a.saleDate).getTime());
-      setSalesHistory(userSales);
+      // Filter sales for current user (if needed - adjust based on your requirements)
+      setSalesHistory(sales);
     } catch (error) {
       console.error('Error loading sales data:', error);
     }
@@ -143,47 +142,57 @@ export default function SalesPage() {
     return cart.reduce((sum, item) => sum + item.totalValue, 0);
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!user || cart.length === 0 || !buyerName) {
       toast.error('Please fill in all required fields and add items to cart');
       return;
     }
 
-    // Create sale items from cart
-    const saleItems = cart.map(item => ({
-      categoryId: item.categoryId,
-      subCategoryId: item.subCategoryId,
-      quantity: item.quantity,
-      rate: item.rate,
-      totalValue: item.totalValue,
-    }));
+    try {
+      // Create sale items from cart
+      const saleItems = cart.map(item => ({
+        categoryId: item.categoryId,
+        subCategoryId: item.subCategoryId,
+        quantity: item.quantity,
+        rate: item.rate,
+        totalValue: item.totalValue,
+      }));
 
-    const sale = apiClient.createSale({
-      buyerName,
-      buyerContact,
-      saleItems,
-      totalAmount: getCartTotal(),
-      remarks: saleRemarks,
-      createdBy: user.id,
-    });
+      const sale = await apiClient.createSale({
+        buyerName,
+        buyerContact,
+        saleItems,
+        totalAmount: getCartTotal(),
+        remarks: saleRemarks,
+        createdBy: user.id,
+      }) as any;
 
-    // Show success message
-    setLastInvoiceNumber(sale.invoiceNumber);
-    setShowSuccess(true);
+      // Show success toast
+      toast.success(`Sale completed successfully! Invoice: ${sale.invoiceNumber}`, {
+        duration: 5000,
+      });
 
-    // Reset form
-    setCart([]);
-    setBuyerName('');
-    setBuyerContact('');
-    setSaleRemarks('');
+      // Show success message
+      setLastInvoiceNumber(sale.invoiceNumber || 'N/A');
+      setShowSuccess(true);
 
-    // Reload data to update stock
-    loadData();
+      // Reset form
+      setCart([]);
+      setBuyerName('');
+      setBuyerContact('');
+      setSaleRemarks('');
 
-    // Hide success message after 5 seconds
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
+      // Reload data to update stock
+      await loadData();
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 5000);
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to create sale');
+      console.error('Sale creation error:', error);
+    }
   };
 
   const handleCategoryFilterChange = (categoryId: string) => {
@@ -528,12 +537,13 @@ export default function SalesPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="buyerContact">Buyer Contact</Label>
+                    <Label htmlFor="buyerContact">Buyer Contact *</Label>
                     <Input
                       id="buyerContact"
                       value={buyerContact}
                       onChange={(e) => setBuyerContact(e.target.value)}
                       placeholder="Phone or email"
+                      required
                     />
                   </div>
 
@@ -595,14 +605,15 @@ export default function SalesPage() {
                           </span>
                         </div>
 
-                        <Button
-                          onClick={handleCheckout}
-                          disabled={cart.length === 0 || !buyerName}
-                          className="w-full bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <Receipt className="h-4 w-4 mr-2" />
-                          Complete Sale
-                        </Button>
+                        {cart.length > 0 && buyerName && buyerContact && (
+                          <Button
+                            onClick={handleCheckout}
+                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <Receipt className="h-4 w-4 mr-2" />
+                            Complete Sale
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}

@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const pool = await connectDB();
     const result = await pool.request().query('SELECT * FROM Categories ORDER BY name');
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       .input('unit', sql.NVarChar, unit)
       .input('createdBy', sql.Int, createdBy || 1)
       .query('INSERT INTO Categories (name, marketRate, unit, createdBy) OUTPUT INSERTED.* VALUES (@name, @marketRate, @unit, @createdBy)');
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset[0] }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -42,7 +42,7 @@ export async function PUT(request: Request) {
       .input('marketRate', sql.Decimal(10, 2), marketRate)
       .input('unit', sql.NVarChar, unit)
       .query('UPDATE Categories SET name = @name, marketRate = @marketRate, unit = @unit WHERE id = @id');
-    await pool.close();
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -55,7 +55,7 @@ export async function DELETE(request: Request) {
     const id = url.searchParams.get('id');
     const pool = await connectDB();
     await pool.request().input('id', sql.Int, parseInt(id!)).query('DELETE FROM Categories WHERE id = @id');
-    await pool.close();
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

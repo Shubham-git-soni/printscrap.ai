@@ -21,23 +21,31 @@ export default function ClientsPage() {
     loadClients();
   }, []);
 
-  const loadClients = () => {
-    const users = apiClient.getUsers();
-    const clientUsers = users.filter(u => u.role === 'client');
-    setClients(clientUsers);
-  };
-
-  const handleToggleActive = (clientId: number, currentStatus: boolean) => {
-    const updatedUser = apiClient.updateUser(clientId, { isActive: !currentStatus });
-    if (updatedUser) {
-      loadClients();
+  const loadClients = async () => {
+    try {
+      const users = await apiClient.getUsers() as any[];
+      const clientUsers = users.filter(u => u.role === 'client');
+      setClients(clientUsers);
+    } catch (error) {
+      console.error('Error loading clients:', error);
     }
   };
 
-  const handleToggleVerified = (clientId: number, currentStatus: boolean) => {
-    const updatedUser = apiClient.updateUser(clientId, { isVerified: !currentStatus });
-    if (updatedUser) {
-      loadClients();
+  const handleToggleActive = async (clientId: number, currentStatus: boolean) => {
+    try {
+      await apiClient.updateUser(clientId, { isActive: !currentStatus });
+      await loadClients();
+    } catch (error) {
+      console.error('Error toggling active status:', error);
+    }
+  };
+
+  const handleToggleVerified = async (clientId: number, currentStatus: boolean) => {
+    try {
+      await apiClient.updateUser(clientId, { isVerified: !currentStatus });
+      await loadClients();
+    } catch (error) {
+      console.error('Error toggling verified status:', error);
     }
   };
 
@@ -153,11 +161,10 @@ export default function ClientsPage() {
                           {new Date(client.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            client.isActive
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-red-100 text-red-700'
-                          }`}>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isActive
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                            }`}>
                             {client.isActive ? (
                               <>
                                 <CheckCircle className="h-3 w-3 mr-1" />
@@ -172,11 +179,10 @@ export default function ClientsPage() {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            client.isVerified
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
-                          }`}>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isVerified
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                            }`}>
                             {client.isVerified ? (
                               <>
                                 <CheckCircle className="h-3 w-3 mr-1" />

@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
       if (checkResult.recordset.length > 0) {
         await transaction.rollback();
-        await pool.close();
+
         return NextResponse.json(
           { success: false, message: 'User with this email already exists' },
           { status: 400 }
@@ -103,7 +103,7 @@ export async function POST(request: Request) {
           WHERE id = @userId
         `);
 
-      await pool.close();
+
 
       const user = userDataResult.recordset[0];
       const authHeader = `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`;
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
     } catch (txError: any) {
       console.error('❌ Transaction error:', txError);
       await transaction.rollback();
-      await pool.close();
+
       throw txError;
     }
   } catch (error: any) {

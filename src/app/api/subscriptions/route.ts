@@ -20,6 +20,7 @@ export async function GET(request: Request) {
             s.startDate,
             s.endDate,
             s.status,
+            s.autoRenew,
             p.name as planName,
             p.price as planPrice,
             u.companyName as userName
@@ -29,7 +30,7 @@ export async function GET(request: Request) {
           WHERE s.userId = @userId
           ORDER BY s.id DESC
         `);
-      await pool.close();
+
       return NextResponse.json({ success: true, data: result.recordset[0] || null });
     } else {
       const result = await pool.request().query(`
@@ -40,6 +41,7 @@ export async function GET(request: Request) {
           s.startDate,
           s.endDate,
           s.status,
+          s.autoRenew,
           p.name as planName,
           p.price as planPrice,
           u.companyName as userName
@@ -48,7 +50,7 @@ export async function GET(request: Request) {
         LEFT JOIN Users u ON s.userId = u.id
         ORDER BY s.id DESC
       `);
-      await pool.close();
+
       return NextResponse.json({ success: true, data: result.recordset });
     }
   } catch (error: any) {
@@ -71,7 +73,7 @@ export async function POST(request: Request) {
         OUTPUT INSERTED.*
         VALUES (@userId, @planId, @startDate, @endDate, @status)
       `);
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset[0] }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -94,7 +96,7 @@ export async function PUT(request: Request) {
         OUTPUT INSERTED.*
         WHERE id = @id
       `);
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset[0] });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

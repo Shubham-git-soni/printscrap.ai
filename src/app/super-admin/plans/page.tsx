@@ -30,43 +30,55 @@ export default function PlansPage() {
     loadPlans();
   }, []);
 
-  const loadPlans = () => {
-    const allPlans = apiClient.getPlans();
-    setPlans(allPlans);
+  const loadPlans = async () => {
+    try {
+      const allPlans = await apiClient.getPlans() as Plan[];
+      setPlans(allPlans);
+    } catch (error) {
+      console.error('Error loading plans:', error);
+    }
   };
 
-  const handleAddPlan = (e: React.FormEvent) => {
+  const handleAddPlan = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const featuresArray = newPlan.features
-      .split('\n')
-      .filter(f => f.trim() !== '')
-      .map(f => f.trim());
+    try {
+      const featuresArray = newPlan.features
+        .split('\n')
+        .filter(f => f.trim() !== '')
+        .map(f => f.trim());
 
-    apiClient.createPlan({
-      name: newPlan.name,
-      description: newPlan.description,
-      price: parseFloat(newPlan.price),
-      billingCycle: newPlan.billingCycle,
-      features: featuresArray,
-    });
+      await apiClient.createPlan({
+        name: newPlan.name,
+        description: newPlan.description,
+        price: parseFloat(newPlan.price),
+        billingCycle: newPlan.billingCycle,
+        features: featuresArray,
+      });
 
-    // Reset form
-    setNewPlan({
-      name: '',
-      description: '',
-      price: '',
-      billingCycle: 'monthly',
-      features: '',
-    });
-    setShowAddForm(false);
-    loadPlans();
+      // Reset form
+      setNewPlan({
+        name: '',
+        description: '',
+        price: '',
+        billingCycle: 'monthly',
+        features: '',
+      });
+      setShowAddForm(false);
+      await loadPlans();
+    } catch (error) {
+      console.error('Error creating plan:', error);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    confirmDelete('Are you sure you want to delete this plan?', () => {
-      apiClient.deletePlan(id);
-      loadPlans();
+  const handleDelete = async (id: number) => {
+    confirmDelete('Are you sure you want to delete this plan?', async () => {
+      try {
+        await apiClient.deletePlan(id);
+        await loadPlans();
+      } catch (error) {
+        console.error('Error deleting plan:', error);
+      }
     });
   };
 

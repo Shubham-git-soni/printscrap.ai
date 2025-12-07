@@ -24,7 +24,7 @@ export default function MastersPage() {
   const [newCategory, setNewCategory] = useState({
     name: '',
     marketRate: '',
-    unit: 'Kg',
+    unit: '',
   });
 
   // Sub-category state
@@ -34,7 +34,7 @@ export default function MastersPage() {
     categoryId: '',
     name: '',
     size: '',
-    unit: 'Kg' as 'Kg' | 'Nos' | 'Tons',
+    unit: '',
     remarks: '',
   });
 
@@ -109,7 +109,7 @@ export default function MastersPage() {
         });
       }
 
-      setNewCategory({ name: '', marketRate: '', unit: 'Kg' });
+      setNewCategory({ name: '', marketRate: '', unit: '' });
       await loadData();
     } catch (error) {
       console.error('Error saving category:', error);
@@ -126,7 +126,7 @@ export default function MastersPage() {
   };
 
   const handleCancelEditCategory = () => {
-    setNewCategory({ name: '', marketRate: '', unit: 'Kg' });
+    setNewCategory({ name: '', marketRate: '', unit: '' });
     setEditingCategoryId(null);
   };
 
@@ -152,10 +152,13 @@ export default function MastersPage() {
         setEditingSubCategoryId(null);
         return;
       } else {
-        // Create new sub-category - API only needs categoryId and name
+        // Create new sub-category with all fields
         await apiClient.createSubCategory({
           categoryId: parseInt(newSubCategory.categoryId),
           name: newSubCategory.name,
+          size: newSubCategory.size,
+          unit: newSubCategory.unit,
+          remarks: newSubCategory.remarks,
         });
       }
 
@@ -163,7 +166,7 @@ export default function MastersPage() {
         categoryId: '',
         name: '',
         size: '',
-        unit: 'Kg',
+        unit: '',
         remarks: '',
       });
       await loadData();
@@ -188,7 +191,7 @@ export default function MastersPage() {
       categoryId: '',
       name: '',
       size: '',
-      unit: 'Kg',
+      unit: '',
       remarks: '',
     });
     setEditingSubCategoryId(null);
@@ -452,9 +455,12 @@ export default function MastersPage() {
                       onChange={(e) => setNewCategory({ ...newCategory, unit: e.target.value })}
                       required
                     >
-                      <option value="Kg">Kg</option>
-                      <option value="Nos">Nos</option>
-                      <option value="Tons">Tons</option>
+                      <option value="">Select Unit</option>
+                      {units.map((unit) => (
+                        <option key={unit.id} value={unit.symbol}>
+                          {unit.name} ({unit.symbol})
+                        </option>
+                      ))}
                     </Select>
                   </div>
                   <div className="flex items-end gap-2">
@@ -576,9 +582,12 @@ export default function MastersPage() {
                       onChange={(e) => setNewSubCategory({ ...newSubCategory, unit: e.target.value as any })}
                       required
                     >
-                      <option value="Kg">Kg</option>
-                      <option value="Nos">Nos</option>
-                      <option value="Tons">Tons</option>
+                      <option value="">Select Unit</option>
+                      {units.map((unit) => (
+                        <option key={unit.id} value={unit.symbol}>
+                          {unit.name} ({unit.symbol})
+                        </option>
+                      ))}
                     </Select>
                   </div>
                   <div>

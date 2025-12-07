@@ -5,58 +5,148 @@ import { connectDB } from '@/lib/db-config';
 export async function GET() {
   try {
     const pool = await connectDB();
-    const result = await pool.request().query(`
+
+    // Get all sales
+    const salesResult = await pool.request().query(`
       SELECT
         s.id,
-        s.scrapEntryId,
-        s.soldWeight,
-        s.rate,
+        s.invoiceNumber,
+        s.buyerName,
+        s.buyerContact,
         s.totalAmount,
+        s.remarks,
         s.saleDate,
-        c.name as categoryName,
+        s.createdBy,
         usr.companyName as userName
       FROM Sales s
-      LEFT JOIN ScrapEntries se ON s.scrapEntryId = se.id
-      LEFT JOIN Categories c ON se.categoryId = c.id
-      LEFT JOIN Users usr ON se.userId = usr.id
+      LEFT JOIN Users usr ON s.createdBy = usr.id
       ORDER BY s.saleDate DESC, s.id DESC
     `);
-    await pool.close();
-    return NextResponse.json({ success: true, data: result.recordset });
+
+    // Get all sale items
+    const itemsResult = await pool.request().query(`
+      SELECT
+        si.saleId,
+        si.categoryId,
+        si.subCategoryId,
+        si.quantity,
+        si.rate,
+        si.totalValue
+      FROM SaleItems si
+    `);
+
+    // Group sale items by saleId
+    const itemsBySaleId: { [key: number]: any[] } = {};
+    itemsResult.recordset.forEach((item: any) => {
+      if (!itemsBySaleId[item.saleId]) {
+        itemsBySaleId[item.saleId] = [];
+      }
+      itemsBySaleId[item.saleId].push(item);
+    });
+
+    // Attach sale items to each sale
+    const salesWithItems = salesResult.recordset.map((sale: any) => ({
+      ...sale,
+      saleItems: itemsBySaleId[sale.id] || [],
+    }));
+
+    return NextResponse.json({ success: true, data: salesWithItems });
   } catch (error: any) {
+    console.error('Sales fetch error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const { scrapEntryId, soldWeight, rate, totalAmount, saleDate } = await request.json();
-    const pool = await connectDB();
+    const { buyerName, buyerContact, saleItems, totalAmount, remarks, createdBy } = await request.json();
 
+    const pool = await connectDB();
     const transaction = pool.transaction();
-    await transaction.begin();
 
     try {
-      const result = await transaction.request()
-        .input('scrapEntryId', sql.Int, scrapEntryId)
-        .input('soldWeight', sql.Decimal(10, 2), soldWeight)
-        .input('rate', sql.Decimal(10, 2), rate)
+      await transaction.begin();
+
+      // Generate invoice number: INV-YYYYMMDD-XXXX
+      const today = new Date();
+      const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
+
+      // Get today's sale count to generate sequential number
+      const countResult = await transaction.request().query(`
+        SELECT COUNT(*) as count 
+        FROM Sales 
+        WHERE CAST(saleDate AS DATE) = CAST(GETDATE() AS DATE)
+      `);
+
+      const todayCount = countResult.recordset[0].count + 1;
+      const invoiceNumber = `INV-${dateStr}-${todayCount.toString().padStart(4, '0')}`;
+
+      // Insert sale
+      const saleResult = await transaction.request()
+        .input('invoiceNumber', sql.NVarChar, invoiceNumber)
+        .input('buyerName', sql.NVarChar, buyerName)
+        .input('buyerContact', sql.NVarChar, buyerContact || null)
         .input('totalAmount', sql.Decimal(10, 2), totalAmount)
-        .input('saleDate', sql.DateTime, saleDate)
+        .input('remarks', sql.NVarChar, remarks || null)
+        .input('createdBy', sql.Int, createdBy)
         .query(`
-          INSERT INTO Sales (scrapEntryId, soldWeight, rate, totalAmount, saleDate)
+          INSERT INTO Sales (invoiceNumber, buyerName, buyerContact, totalAmount, remarks, createdBy, saleDate)
           OUTPUT INSERTED.*
-          VALUES (@scrapEntryId, @soldWeight, @rate, @totalAmount, @saleDate)
+          VALUES (@invoiceNumber, @buyerName, @buyerContact, @totalAmount, @remarks, @createdBy, GETDATE())
         `);
 
+      const saleId = saleResult.recordset[0].id;
+
+      // Insert sale items and update stock
+      for (const item of saleItems) {
+        // Insert sale item
+        await transaction.request()
+          .input('saleId', sql.Int, saleId)
+          .input('categoryId', sql.Int, item.categoryId)
+          .input('subCategoryId', sql.Int, item.subCategoryId || null)
+          .input('quantity', sql.Decimal(10, 2), item.quantity)
+          .input('rate', sql.Decimal(10, 2), item.rate)
+          .input('totalValue', sql.Decimal(10, 2), item.totalValue)
+          .query(`
+            INSERT INTO SaleItems (saleId, categoryId, subCategoryId, quantity, rate, totalValue)
+            VALUES (@saleId, @categoryId, @subCategoryId, @quantity, @rate, @totalValue)
+          `);
+
+        // Update stock - decrease available stock, increase outflow
+        const stockUpdateQuery = item.subCategoryId
+          ? `UPDATE Stock 
+             SET totalOutflow = totalOutflow + @quantity,
+                 availableStock = availableStock - @quantity,
+                 totalValue = availableStock * averageRate
+             WHERE categoryId = @categoryId 
+               AND subCategoryId = @subCategoryId 
+               AND userId = @userId`
+          : `UPDATE Stock 
+             SET totalOutflow = totalOutflow + @quantity,
+                 availableStock = availableStock - @quantity,
+                 totalValue = availableStock * averageRate
+             WHERE categoryId = @categoryId 
+               AND subCategoryId IS NULL 
+               AND userId = @userId`;
+
+        await transaction.request()
+          .input('categoryId', sql.Int, item.categoryId)
+          .input('subCategoryId', sql.Int, item.subCategoryId || null)
+          .input('quantity', sql.Decimal(10, 2), item.quantity)
+          .input('userId', sql.Int, createdBy)
+          .query(stockUpdateQuery);
+      }
+
       await transaction.commit();
-      await pool.close();
-      return NextResponse.json({ success: true, data: result.recordset[0] }, { status: 201 });
+
+      return NextResponse.json({ success: true, data: saleResult.recordset[0] }, { status: 201 });
     } catch (err) {
       await transaction.rollback();
+
       throw err;
     }
   } catch (error: any) {
+    console.error('Sales creation error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }

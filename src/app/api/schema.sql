@@ -54,6 +54,9 @@ CREATE TABLE SubCategories (
     id INT IDENTITY(1,1) PRIMARY KEY,
     categoryId INT NOT NULL,
     name NVARCHAR(255) NOT NULL,
+    size NVARCHAR(100),
+    unit NVARCHAR(50),
+    remarks NVARCHAR(MAX),
     createdBy INT NOT NULL,
     FOREIGN KEY (categoryId) REFERENCES Categories(id) ON DELETE CASCADE,
     FOREIGN KEY (createdBy) REFERENCES Users(id)

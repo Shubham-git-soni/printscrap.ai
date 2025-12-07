@@ -34,7 +34,7 @@ export async function GET() {
       LEFT JOIN Users usr ON se.createdBy = usr.id
       ORDER BY se.createdAt DESC
     `);
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
         OUTPUT INSERTED.*
         VALUES (@entryType, @categoryId, @subCategoryId, @departmentId, @machineId, @quantity, @unit, @rate, @totalValue, @jobNumber, @remarks, @createdBy)
       `);
-    await pool.close();
+
     return NextResponse.json({ success: true, data: result.recordset[0] }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });

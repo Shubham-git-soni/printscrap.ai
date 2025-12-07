@@ -16,9 +16,9 @@ async function apiFetch<T>(
 ): Promise<T> {
   const authHeader = getAuthHeader();
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (authHeader) {
@@ -115,7 +115,7 @@ export const apiClient = {
 
   // Sub-Categories
   getSubCategories: () => apiFetch('/subcategories'),
-  createSubCategory: (subCategory: { categoryId: number; name: string }) =>
+  createSubCategory: (subCategory: { categoryId: number; name: string; size?: string; unit?: string; remarks?: string }) =>
     apiFetch('/subcategories', {
       method: 'POST',
       body: JSON.stringify(subCategory),
@@ -168,6 +168,11 @@ export const apiClient = {
 
   // Stock
   getStock: (userId: number) => apiFetch(`/stock?userId=${userId}`),
+  updateStock: (stock: { categoryId: number; subCategoryId?: number; userId: number; quantity: number; unit: string; rate: number }) =>
+    apiFetch('/stock', {
+      method: 'POST',
+      body: JSON.stringify(stock),
+    }),
 
   // Sales
   getSales: () => apiFetch('/sales'),
@@ -179,6 +184,15 @@ export const apiClient = {
 
   // Plans
   getPlans: () => apiFetch('/plans'),
+  createPlan: (planData: any) =>
+    apiFetch('/plans', {
+      method: 'POST',
+      body: JSON.stringify(planData),
+    }),
+  deletePlan: (planId: number) =>
+    apiFetch(`/plans?id=${planId}`, {
+      method: 'DELETE',
+    }),
 
   // Subscriptions
   getSubscription: (userId: number) => apiFetch(`/subscriptions?userId=${userId}`),
@@ -186,11 +200,24 @@ export const apiClient = {
 
   // Users (Super Admin)
   getUsers: () => apiFetch('/users'),
-  updateUser: (userId: number, updates: any) =>
-    apiFetch(`/users`, {
+  updateUser: async (userId: number, updates: any) => {
+    const response = await fetch(`${API_URL}/users`, {
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(getAuthHeader() && { 'Authorization': getAuthHeader()! })
+      },
       body: JSON.stringify({ id: userId, ...updates }),
-    }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Update failed');
+    }
+
+    return data.data;
+  },
   deleteUser: (userId: number) =>
     apiFetch(`/users?id=${userId}`, { method: 'DELETE' }),
 };

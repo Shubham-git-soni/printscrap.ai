@@ -34,7 +34,7 @@ export async function GET(request: Request) {
         ORDER BY s.id DESC
       `);
 
-    await pool.close();
+
 
     if (result.recordset.length === 0) {
       return NextResponse.json({

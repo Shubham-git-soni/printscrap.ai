@@ -11,7 +11,7 @@ import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiClient } from '@/lib/api-client';
-import { ScrapCategory, ScrapSubCategory, ScrapEntry, Department, Machine } from '@/lib/types';
+import { ScrapCategory, ScrapSubCategory, ScrapEntry, Department, Machine, Unit } from '@/lib/types';
 import { Plus, FileText, Package, Calendar } from 'lucide-react';
 
 export default function ScrapEntryPage() {
@@ -25,6 +25,7 @@ export default function ScrapEntryPage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [filteredMachines, setFilteredMachines] = useState<Machine[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
 
   // Job-Based Entry State
   const [jobEntry, setJobEntry] = useState({
@@ -34,7 +35,7 @@ export default function ScrapEntryPage() {
     departmentId: '',
     machineId: '',
     quantity: '',
-    unit: 'Kg' as 'Kg' | 'Nos' | 'Tons',
+    unit: '',
     rate: '',
     remarks: '',
   });
@@ -46,7 +47,7 @@ export default function ScrapEntryPage() {
     departmentId: '',
     machineId: '',
     quantity: '',
-    unit: 'Kg' as 'Kg' | 'Nos' | 'Tons',
+    unit: '',
     rate: '',
     remarks: '',
   });
@@ -60,23 +61,25 @@ export default function ScrapEntryPage() {
 
   const loadData = async () => {
     try {
-      const [cats, subs, entries, depts, machs] = await Promise.all([
+      const [cats, subs, entries, depts, machs, unitsData] = await Promise.all([
         apiClient.getCategories(),
         apiClient.getSubCategories(),
         apiClient.getScrapEntries(),
         apiClient.getDepartments(),
         apiClient.getMachines(),
+        apiClient.getUnits(),
       ]);
 
       setCategories(cats as ScrapCategory[]);
       setSubCategories(subs as ScrapSubCategory[]);
       setDepartments(depts as Department[]);
       setMachines(machs as Machine[]);
+      setUnits(unitsData as Unit[]);
 
       // Filter entries for current user and get recent 10
       if (user) {
         const userEntries = (entries as ScrapEntry[])
-          .filter((e: any) => e.userId === user.id)
+          .filter((e: any) => e.createdBy === user.id)
           .slice(0, 10);
         setRecentEntries(userEntries);
       }
@@ -123,78 +126,110 @@ export default function ScrapEntryPage() {
     setFilteredMachines(filtered);
   };
 
-  const handleJobSubmit = (e: React.FormEvent) => {
+  const handleJobSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    const totalValue = parseFloat(jobEntry.quantity) * parseFloat(jobEntry.rate);
+    try {
+      const totalValue = parseFloat(jobEntry.quantity) * parseFloat(jobEntry.rate);
 
-    apiClient.createScrapEntry({
-      categoryId: parseInt(jobEntry.categoryId),
-      subCategoryId: jobEntry.subCategoryId ? parseInt(jobEntry.subCategoryId) : undefined,
-      departmentId: parseInt(jobEntry.departmentId),
-      machineId: jobEntry.machineId ? parseInt(jobEntry.machineId) : undefined,
-      quantity: parseFloat(jobEntry.quantity),
-      unit: jobEntry.unit,
-      rate: parseFloat(jobEntry.rate),
-      totalValue,
-      entryType: 'job-based',
-      jobNumber: jobEntry.jobNumber,
-      remarks: jobEntry.remarks,
-      createdBy: user.id,
-    });
+      await apiClient.createScrapEntry({
+        categoryId: parseInt(jobEntry.categoryId),
+        subCategoryId: jobEntry.subCategoryId ? parseInt(jobEntry.subCategoryId) : undefined,
+        departmentId: parseInt(jobEntry.departmentId),
+        machineId: jobEntry.machineId ? parseInt(jobEntry.machineId) : undefined,
+        quantity: parseFloat(jobEntry.quantity),
+        unit: jobEntry.unit,
+        rate: parseFloat(jobEntry.rate),
+        totalValue,
+        entryType: 'job-based',
+        jobNumber: jobEntry.jobNumber,
+        remarks: jobEntry.remarks,
+        createdBy: user.id,
+      });
 
-    // Reset form
-    setJobEntry({
-      jobNumber: '',
-      categoryId: '',
-      subCategoryId: '',
-      departmentId: '',
-      machineId: '',
-      quantity: '',
-      unit: 'Kg',
-      rate: '',
-      remarks: '',
-    });
-    setFilteredSubCategories([]);
-    setFilteredMachines([]);
-    loadData();
+      // Update stock
+      await apiClient.updateStock({
+        categoryId: parseInt(jobEntry.categoryId),
+        subCategoryId: jobEntry.subCategoryId ? parseInt(jobEntry.subCategoryId) : undefined,
+        userId: user.id,
+        quantity: parseFloat(jobEntry.quantity),
+        unit: jobEntry.unit,
+        rate: parseFloat(jobEntry.rate),
+      });
+
+      // Reset form
+      setJobEntry({
+        jobNumber: '',
+        categoryId: '',
+        subCategoryId: '',
+        departmentId: '',
+        machineId: '',
+        quantity: '',
+        unit: '',
+        rate: '',
+        remarks: '',
+      });
+      setFilteredSubCategories([]);
+      setFilteredMachines([]);
+
+      // Reload data to show new entry
+      await loadData();
+    } catch (error) {
+      console.error('Error creating scrap entry:', error);
+    }
   };
 
-  const handleGeneralSubmit = (e: React.FormEvent) => {
+  const handleGeneralSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    const totalValue = parseFloat(generalEntry.quantity) * parseFloat(generalEntry.rate);
+    try {
+      const totalValue = parseFloat(generalEntry.quantity) * parseFloat(generalEntry.rate);
 
-    apiClient.createScrapEntry({
-      categoryId: parseInt(generalEntry.categoryId),
-      subCategoryId: generalEntry.subCategoryId ? parseInt(generalEntry.subCategoryId) : undefined,
-      departmentId: parseInt(generalEntry.departmentId),
-      machineId: generalEntry.machineId ? parseInt(generalEntry.machineId) : undefined,
-      quantity: parseFloat(generalEntry.quantity),
-      unit: generalEntry.unit,
-      rate: parseFloat(generalEntry.rate),
-      totalValue,
-      entryType: 'general',
-      remarks: generalEntry.remarks,
-      createdBy: user.id,
-    });
+      await apiClient.createScrapEntry({
+        categoryId: parseInt(generalEntry.categoryId),
+        subCategoryId: generalEntry.subCategoryId ? parseInt(generalEntry.subCategoryId) : undefined,
+        departmentId: parseInt(generalEntry.departmentId),
+        machineId: generalEntry.machineId ? parseInt(generalEntry.machineId) : undefined,
+        quantity: parseFloat(generalEntry.quantity),
+        unit: generalEntry.unit,
+        rate: parseFloat(generalEntry.rate),
+        totalValue,
+        entryType: 'general',
+        remarks: generalEntry.remarks,
+        createdBy: user.id,
+      });
 
-    // Reset form
-    setGeneralEntry({
-      categoryId: '',
-      subCategoryId: '',
-      departmentId: '',
-      machineId: '',
-      quantity: '',
-      unit: 'Kg',
-      rate: '',
-      remarks: '',
-    });
-    setFilteredSubCategories([]);
-    setFilteredMachines([]);
-    loadData();
+      // Update stock
+      await apiClient.updateStock({
+        categoryId: parseInt(generalEntry.categoryId),
+        subCategoryId: generalEntry.subCategoryId ? parseInt(generalEntry.subCategoryId) : undefined,
+        userId: user.id,
+        quantity: parseFloat(generalEntry.quantity),
+        unit: generalEntry.unit,
+        rate: parseFloat(generalEntry.rate),
+      });
+
+      // Reset form
+      setGeneralEntry({
+        categoryId: '',
+        subCategoryId: '',
+        departmentId: '',
+        machineId: '',
+        quantity: '',
+        unit: '',
+        rate: '',
+        remarks: '',
+      });
+      setFilteredSubCategories([]);
+      setFilteredMachines([]);
+
+      // Reload data to show new entry
+      await loadData();
+    } catch (error) {
+      console.error('Error creating scrap entry:', error);
+    }
   };
 
   const getCategoryName = (catId: number) => {
@@ -227,8 +262,8 @@ export default function ScrapEntryPage() {
         <div className="flex gap-4 mb-6 border-b">
           <button
             className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'job-based'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setActiveTab('job-based')}
           >
@@ -237,8 +272,8 @@ export default function ScrapEntryPage() {
           </button>
           <button
             className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'general'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setActiveTab('general')}
           >
@@ -360,9 +395,12 @@ export default function ScrapEntryPage() {
                         onChange={(e) => setJobEntry({ ...jobEntry, unit: e.target.value as any })}
                         required
                       >
-                        <option value="Kg">Kg</option>
-                        <option value="Nos">Nos</option>
-                        <option value="Tons">Tons</option>
+                        <option value="">Select Unit</option>
+                        {units.map((unit) => (
+                          <option key={unit.id} value={unit.symbol}>
+                            {unit.name} ({unit.symbol})
+                          </option>
+                        ))}
                       </Select>
                     </div>
 
@@ -375,7 +413,9 @@ export default function ScrapEntryPage() {
                         value={jobEntry.rate}
                         onChange={(e) => setJobEntry({ ...jobEntry, rate: e.target.value })}
                         required
-                        placeholder="e.g., 25"
+                        disabled
+                        placeholder="Auto-filled from category"
+                        className="bg-gray-100 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -511,9 +551,12 @@ export default function ScrapEntryPage() {
                         onChange={(e) => setGeneralEntry({ ...generalEntry, unit: e.target.value as any })}
                         required
                       >
-                        <option value="Kg">Kg</option>
-                        <option value="Nos">Nos</option>
-                        <option value="Tons">Tons</option>
+                        <option value="">Select Unit</option>
+                        {units.map((unit) => (
+                          <option key={unit.id} value={unit.symbol}>
+                            {unit.name} ({unit.symbol})
+                          </option>
+                        ))}
                       </Select>
                     </div>
 
@@ -526,7 +569,9 @@ export default function ScrapEntryPage() {
                         value={generalEntry.rate}
                         onChange={(e) => setGeneralEntry({ ...generalEntry, rate: e.target.value })}
                         required
-                        placeholder="e.g., 25"
+                        disabled
+                        placeholder="Auto-filled from category"
+                        className="bg-gray-100 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -593,8 +638,8 @@ export default function ScrapEntryPage() {
                       <TableCell>{new Date(entry.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${entry.entryType === 'job-based'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-green-100 text-green-700'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-green-100 text-green-700'
                           }`}>
                           {entry.entryType}
                         </span>

@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiClient } from '@/lib/api-client';
 import { StockItem, ScrapCategory, ScrapSubCategory } from '@/lib/types';
-import { Package, Search, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import { Package, Search, TrendingUp, TrendingDown, IndianRupee } from 'lucide-react';
 
 export default function InventoryPage() {
   const { user } = useAuth();
@@ -33,24 +33,34 @@ export default function InventoryPage() {
     loadData();
   }, [user]);
 
-  const loadData = () => {
+  const loadData = async () => {
     if (!user) return;
 
-    const stockData = apiClient.getStock(user.id);
-    const cats = apiClient.getCategories();
-    const subs = apiClient.getSubCategories();
+    try {
+      const [stockData, cats, subs] = await Promise.all([
+        apiClient.getStock(user.id),
+        apiClient.getCategories(),
+        apiClient.getSubCategories(),
+      ]) as [StockItem[], ScrapCategory[], ScrapSubCategory[]];
 
-    setStock(stockData);
-    setCategories(cats);
-    setSubCategories(subs);
+      setStock(stockData);
+      setCategories(cats);
+      setSubCategories(subs);
 
-    // Calculate totals
-    const value = stockData.reduce((sum, item) => sum + item.totalValue, 0);
-    const weight = stockData.reduce((sum, item) => sum + item.availableStock, 0);
+      // Calculate totals
+      const value = stockData.reduce((sum, item) => sum + item.totalValue, 0);
+      const weight = stockData.reduce((sum, item) => sum + item.availableStock, 0);
 
-    setTotalValue(value);
-    setTotalWeight(weight);
-    setTotalItems(stockData.length);
+      setTotalValue(value);
+      setTotalWeight(weight);
+      setTotalItems(stockData.length);
+    } catch (error) {
+      console.error('Error loading inventory data:', error);
+      // Set empty arrays on error
+      setStock([]);
+      setCategories([]);
+      setSubCategories([]);
+    }
   };
 
   const getCategoryName = (catId: number) => {
@@ -99,7 +109,7 @@ export default function InventoryPage() {
     const categoryName = getCategoryName(item.categoryId).toLowerCase();
     const subCategoryName = getSubCategoryName(item.subCategoryId).toLowerCase();
     const matchesSearch = categoryName.includes(searchTerm.toLowerCase()) ||
-                          subCategoryName.includes(searchTerm.toLowerCase());
+      subCategoryName.includes(searchTerm.toLowerCase());
     const matchesCategory = !filterCategory || item.categoryId === parseInt(filterCategory);
     const matchesSubCategory = !filterSubCategory || item.subCategoryId === parseInt(filterSubCategory);
 
@@ -123,7 +133,7 @@ export default function InventoryPage() {
               <CardTitle className="text-sm font-medium text-gray-600">
                 Total Stock Value
               </CardTitle>
-              <DollarSign className="h-5 w-5 text-green-600" />
+              <IndianRupee className="h-5 w-5 text-green-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">Rs.{totalValue.toLocaleString()}</div>
@@ -307,9 +317,8 @@ export default function InventoryPage() {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <span className={`font-semibold ${
-                            item.availableStock > 0 ? 'text-blue-600' : 'text-gray-400'
-                          }`}>
+                          <span className={`font-semibold ${item.availableStock > 0 ? 'text-blue-600' : 'text-gray-400'
+                            }`}>
                             {item.availableStock.toFixed(2)}
                           </span>
                         </TableCell>

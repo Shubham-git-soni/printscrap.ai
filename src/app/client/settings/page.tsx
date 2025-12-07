@@ -41,11 +41,11 @@ export default function SettingsPage() {
             const [sub, plans] = await Promise.all([
               apiClient.getSubscription(user.id),
               apiClient.getPlans(),
-            ]);
+            ]) as [Subscription | null, Plan[]];
 
-            if (sub) {
+            if (sub && sub.id) {
               setSubscription(sub);
-              const p = plans.find((pl: any) => pl.id === sub.planId);
+              const p = plans.find((pl) => pl.id === sub.planId);
               setPlan(p || null);
             }
           } catch (error) {
@@ -58,22 +58,26 @@ export default function SettingsPage() {
     loadData();
   }, [user]);
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    const updatedUser = apiClient.updateUser(user.id, {
-      companyName,
-      email,
-      contactNumber,
-      address,
-    });
+    try {
+      const updatedUser = await apiClient.updateUser(user.id, {
+        companyName,
+        email,
+        contactNumber,
+        address,
+      });
 
-    if (updatedUser) {
-      setUser(updatedUser);
-      localStorage.setItem('current_user', JSON.stringify(updatedUser));
-      setProfileSuccess(true);
-      setTimeout(() => setProfileSuccess(false), 3000);
+      if (updatedUser) {
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setProfileSuccess(true);
+        setTimeout(() => setProfileSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
     }
   };
 
@@ -89,8 +93,8 @@ export default function SettingsPage() {
         <div className="flex gap-4 mb-6 border-b">
           <button
             className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'profile'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setActiveTab('profile')}
           >
@@ -99,8 +103,8 @@ export default function SettingsPage() {
           </button>
           <button
             className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'subscription'
-                ? 'border-b-2 border-primary text-primary'
-                : 'text-gray-500 hover:text-gray-700'
+              ? 'border-b-2 border-primary text-primary'
+              : 'text-gray-500 hover:text-gray-700'
               }`}
             onClick={() => setActiveTab('subscription')}
           >
@@ -247,9 +251,9 @@ export default function SettingsPage() {
                         <div>
                           <p className="text-sm text-gray-600">Status</p>
                           <span className={`inline-flex px-3 py-1 mt-1 rounded-full text-sm font-medium ${subscription.status === 'active' ? 'bg-green-100 text-green-700' :
-                              subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                                subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                  'bg-yellow-100 text-yellow-700'
+                            subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                              subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                'bg-yellow-100 text-yellow-700'
                             }`}>
                             {subscription.status}
                           </span>
