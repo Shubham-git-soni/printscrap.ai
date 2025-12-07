@@ -1,15 +1,19 @@
 import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
+import { sendPlanActivationEmail } from '@/lib/email';
 
 // POST - Approve plan activation request
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { approvedBy, approvalNotes } = await request.json();
-    const requestId = parseInt(params.id);
+    const { approvedBy, approvalNotes, startDate: reqStartDate, endDate: reqEndDate } = await request.json();
+    const { id } = await params;
+    const requestId = parseInt(id);
+
+    console.log('🔍 Approve Request - ID:', requestId, 'ApprovedBy:', approvedBy);
 
     if (!approvedBy) {
       return NextResponse.json(
@@ -19,6 +23,14 @@ export async function POST(
     }
 
     const pool = await connectDB();
+
+    // Debug: Check if request exists at all
+    const debugResult = await pool.request()
+      .input('requestId', sql.Int, requestId)
+      .query(`SELECT id, status FROM PlanActivationRequests WHERE id = @requestId`);
+
+    console.log('📊 Request exists?', debugResult.recordset.length > 0,
+                'Status:', debugResult.recordset[0]?.status);
 
     // Get the request details
     const requestResult = await pool.request()
@@ -30,8 +42,10 @@ export async function POST(
         WHERE par.id = @requestId AND par.status = 'pending'
       `);
 
+    console.log('📊 Pending request found?', requestResult.recordset.length > 0);
+
     if (requestResult.recordset.length === 0) {
-      await pool.close();
+      console.log('❌ Request not found or not pending');
       return NextResponse.json(
         { success: false, message: 'Request not found or already processed' },
         { status: 404 }
@@ -40,22 +54,32 @@ export async function POST(
 
     const planRequest = requestResult.recordset[0];
 
-    // Calculate subscription dates based on billing cycle
-    const startDate = new Date();
-    let endDate = new Date();
+    // Use provided dates or calculate based on billing cycle
+    let startDate: Date;
+    let endDate: Date;
 
-    switch (planRequest.billingCycle) {
-      case 'daily':
-        endDate.setDate(endDate.getDate() + 1);
-        break;
-      case 'monthly':
-        endDate.setMonth(endDate.getMonth() + 1);
-        break;
-      case 'yearly':
-        endDate.setFullYear(endDate.getFullYear() + 1);
-        break;
-      default:
-        endDate.setMonth(endDate.getMonth() + 1); // Default to monthly
+    if (reqStartDate && reqEndDate) {
+      // Use dates provided by admin
+      startDate = new Date(reqStartDate);
+      endDate = new Date(reqEndDate);
+    } else {
+      // Fallback: Calculate subscription dates based on billing cycle
+      startDate = new Date();
+      endDate = new Date();
+
+      switch (planRequest.billingCycle) {
+        case 'daily':
+          endDate.setDate(endDate.getDate() + 1);
+          break;
+        case 'monthly':
+          endDate.setMonth(endDate.getMonth() + 1);
+          break;
+        case 'yearly':
+          endDate.setFullYear(endDate.getFullYear() + 1);
+          break;
+        default:
+          endDate.setMonth(endDate.getMonth() + 1); // Default to monthly
+      }
     }
 
     // Check if user already has an active subscription
@@ -126,7 +150,30 @@ export async function POST(
         WHERE id = @requestId
       `);
 
-    await pool.close();
+    // Get user and plan details for email
+    const userResult = await pool.request()
+      .input('userId', sql.Int, planRequest.userId)
+      .query('SELECT email, companyName FROM Users WHERE id = @userId');
+
+    const planResult = await pool.request()
+      .input('planId', sql.Int, planRequest.planId)
+      .query('SELECT name FROM Plans WHERE id = @planId');
+
+    // Send activation email to client (async, don't wait)
+    if (userResult.recordset.length > 0 && planResult.recordset.length > 0) {
+      const user = userResult.recordset[0];
+      const plan = planResult.recordset[0];
+
+      sendPlanActivationEmail(
+        user.email,
+        user.companyName,
+        plan.name,
+        startDate.toISOString(),
+        endDate.toISOString()
+      ).catch(err => {
+        console.error('❌ Failed to send activation email:', err);
+      });
+    }
 
     return NextResponse.json({
       success: true,

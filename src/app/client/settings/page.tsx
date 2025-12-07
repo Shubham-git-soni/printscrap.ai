@@ -506,8 +506,8 @@ export default function SettingsPage() {
                     <Mail className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
                     <div>
                       <p className="font-semibold text-gray-900">Email Us</p>
-                      <a href="mailto:support@printscrap.ai" className="text-blue-600 hover:underline mt-1 block">
-                        support@printscrap.ai
+                      <a href="mailto:wecare@indusanalytics.in" className="text-blue-600 hover:underline mt-1 block">
+                        wecare@indusanalytics.in
                       </a>
                     </div>
                   </div>

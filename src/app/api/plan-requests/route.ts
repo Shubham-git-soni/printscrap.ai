@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     query += ' ORDER BY par.requestedAt DESC';
 
     const result = await request_obj.query(query);
-    await pool.close();
+    // Don't close singleton pool - it's reused across requests
 
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {
@@ -85,7 +85,6 @@ export async function POST(request: Request) {
       `);
 
     if (existingRequest.recordset.length > 0) {
-      await pool.close();
       return NextResponse.json(
         { success: false, message: 'You already have a pending request for this plan' },
         { status: 400 }
@@ -114,8 +113,6 @@ export async function POST(request: Request) {
         OUTPUT INSERTED.*
         VALUES (@userId, @planId, @requestMessage, 'pending')
       `);
-
-    await pool.close();
 
     // Get super admin email
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@printscrap.ai';

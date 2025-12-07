@@ -92,10 +92,10 @@ export function TrialExpiredModal({ plans, onClose }: TrialExpiredModalProps) {
                   <div>
                     <p className="text-xs text-gray-600">Email Us</p>
                     <a
-                      href="mailto:support@printscrap.ai"
+                      href="mailto:wecare@indusanalytics.in"
                       className="text-blue-600 font-semibold hover:underline"
                     >
-                      support@printscrap.ai
+                      wecare@indusanalytics.in
                     </a>
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export function TrialExpiredModal({ plans, onClose }: TrialExpiredModalProps) {
             {/* Action Buttons */}
             <div className="flex justify-center gap-4 mt-6">
               <Button
-                onClick={() => window.open('mailto:support@printscrap.ai', '_blank')}
+                onClick={() => window.open('mailto:wecare@indusanalytics.in', '_blank')}
                 className="px-8"
               >
                 <Mail className="h-4 w-4 mr-2" />
