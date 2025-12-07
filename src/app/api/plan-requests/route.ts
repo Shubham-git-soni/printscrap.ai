@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
+import { sendPlanRequestNotification } from '@/lib/email';
 
 // GET all plan activation requests
 export async function GET(request: Request) {
@@ -91,6 +92,18 @@ export async function POST(request: Request) {
       );
     }
 
+    // Get user and plan details for email
+    const userResult = await pool.request()
+      .input('userId', sql.Int, userId)
+      .query('SELECT companyName, email FROM Users WHERE id = @userId');
+
+    const planResult = await pool.request()
+      .input('planId', sql.Int, planId)
+      .query('SELECT name FROM Plans WHERE id = @planId');
+
+    const user = userResult.recordset[0];
+    const plan = planResult.recordset[0];
+
     // Create new request
     const result = await pool.request()
       .input('userId', sql.Int, userId)
@@ -103,6 +116,22 @@ export async function POST(request: Request) {
       `);
 
     await pool.close();
+
+    // Get super admin email
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@printscrap.ai';
+
+    // Send notification email to admin (async, don't wait)
+    if (user && plan) {
+      sendPlanRequestNotification(
+        adminEmail,
+        user.companyName,
+        user.email,
+        plan.name,
+        requestMessage
+      ).catch(err => {
+        console.error('❌ Failed to send plan request email:', err);
+      });
+    }
 
     return NextResponse.json(
       { success: true, data: result.recordset[0], message: 'Plan activation request submitted successfully' },

@@ -13,6 +13,7 @@ CREATE TABLE Users (
     isActive BIT DEFAULT 0,
     isVerified BIT DEFAULT 0,
     subscriptionId INT,
+    verificationToken NVARCHAR(500),
     createdAt DATETIME DEFAULT GETDATE()
 );
 

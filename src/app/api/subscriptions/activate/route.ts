@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
+import { sendPlanActivationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
     try {
@@ -87,7 +88,27 @@ export async function POST(request: Request) {
             .input('subscriptionId', sql.Int, subscriptionId)
             .query('UPDATE Users SET subscriptionId = @subscriptionId WHERE id = @userId');
 
+        // Get user details for email
+        const userResult = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query('SELECT email, companyName FROM Users WHERE id = @userId');
+
+        const user = userResult.recordset[0];
+
         await pool.close();
+
+        // Send activation email to client (async, don't wait)
+        if (user) {
+            sendPlanActivationEmail(
+                user.email,
+                user.companyName,
+                plan.name,
+                startDate.toISOString(),
+                endDate.toISOString()
+            ).catch(err => {
+                console.error('❌ Failed to send activation email:', err);
+            });
+        }
 
         return NextResponse.json({
             success: true,

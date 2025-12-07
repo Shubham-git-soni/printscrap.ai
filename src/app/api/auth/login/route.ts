@@ -75,6 +75,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if email is verified (only for clients, not super_admin)
+    if (user.role === 'client' && !user.isVerified) {
+      console.log('❌ Email not verified');
+      return NextResponse.json(
+        { success: false, message: 'Please verify your email before logging in. Check your inbox for the verification link.' },
+        { status: 403 }
+      );
+    }
+
     // Remove password from response
     delete user.password;
 

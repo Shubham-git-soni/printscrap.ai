@@ -1,6 +1,7 @@
 // Register API - Next.js App Router + Database
 import { NextResponse } from 'next/server';
 import sql from 'mssql';
+import { sendVerificationEmail } from '@/lib/email';
 
 const config: sql.config = {
   user: process.env.DB_USER!,
@@ -48,6 +49,9 @@ export async function POST(request: Request) {
         );
       }
 
+      // Generate verification token (simple random string)
+      const verificationToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
       // Insert user
       const userResult = await transaction
         .request()
@@ -56,10 +60,11 @@ export async function POST(request: Request) {
         .input('companyName', sql.NVarChar, companyName)
         .input('contactNumber', sql.NVarChar, contactNumber || null)
         .input('address', sql.NVarChar, address || null)
+        .input('verificationToken', sql.NVarChar, verificationToken)
         .query(`
-          INSERT INTO Users (email, password, role, companyName, contactNumber, address, isActive, isVerified)
+          INSERT INTO Users (email, password, role, companyName, contactNumber, address, isActive, isVerified, verificationToken)
           OUTPUT INSERTED.id
-          VALUES (@email, @password, 'client', @companyName, @contactNumber, @address, 1, 0)
+          VALUES (@email, @password, 'client', @companyName, @contactNumber, @address, 1, 0, @verificationToken)
         `);
 
       const userId = userResult.recordset[0].id;
@@ -103,16 +108,19 @@ export async function POST(request: Request) {
           WHERE id = @userId
         `);
 
-
-
       const user = userDataResult.recordset[0];
       const authHeader = `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`;
+
+      // Send verification email (don't wait for it, run async)
+      sendVerificationEmail(email, verificationToken).catch(err => {
+        console.error('❌ Failed to send verification email:', err);
+      });
 
       console.log('✅ User registered successfully:', email);
 
       return NextResponse.json({
         success: true,
-        message: 'Registration successful. You have been granted a 1-day trial.',
+        message: 'Registration successful. Please check your email to verify your account. You have been granted a 1-day trial.',
         data: { user, authHeader },
       });
     } catch (txError: any) {
