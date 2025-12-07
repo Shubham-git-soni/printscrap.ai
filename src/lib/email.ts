@@ -32,7 +32,7 @@ export async function sendVerificationEmail(to: string, verificationToken: strin
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background: #1e40af; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
             .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
-            .button { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .button { display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
             .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
           </style>
         </head>
@@ -45,7 +45,7 @@ export async function sendVerificationEmail(to: string, verificationToken: strin
               <h2>Verify Your Email Address</h2>
               <p>Thank you for registering with PrintScrap.ai. Please verify your email address to activate your account.</p>
               <p>Click the button below to verify your email:</p>
-              <a href="${verificationUrl}" class="button">Verify Email Address</a>
+              <a href="${verificationUrl}" class="button" style="display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">Verify Email Address</a>
               <p>Or copy and paste this link in your browser:</p>
               <p style="word-break: break-all; color: #2563eb;">${verificationUrl}</p>
               <p>This link will expire in 24 hours.</p>
@@ -94,7 +94,7 @@ export async function sendPlanRequestNotification(
             .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
             .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
             .info-box { background: white; padding: 15px; border-left: 4px solid #2563eb; margin: 20px 0; }
-            .button { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .button { display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
             .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
           </style>
         </head>
@@ -115,7 +115,7 @@ export async function sendPlanRequestNotification(
               </div>
 
               <p>Please login to your admin panel to approve or reject this request.</p>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/super-admin/plan-requests" class="button">View Plan Requests</a>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/super-admin/plan-requests" class="button" style="display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Plan Requests</a>
             </div>
             <div class="footer">
               <p>&copy; 2025 PrintScrap.ai. All rights reserved.</p>
@@ -160,7 +160,7 @@ export async function sendPlanActivationEmail(
             .header { background: #059669; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
             .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
             .info-box { background: white; padding: 15px; border-left: 4px solid #059669; margin: 20px 0; }
-            .button { display: inline-block; background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            .button { display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
             .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
           </style>
         </head>
@@ -180,7 +180,7 @@ export async function sendPlanActivationEmail(
               </div>
 
               <p>You now have full access to all features. Login to your account to get started!</p>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/client/dashboard" class="button">Go to Dashboard</a>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/client/dashboard" class="button" style="display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">Go to Dashboard</a>
             </div>
             <div class="footer">
               <p>&copy; 2025 PrintScrap.ai. All rights reserved.</p>
