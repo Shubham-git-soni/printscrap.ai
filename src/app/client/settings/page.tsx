@@ -28,6 +28,13 @@ export default function SettingsPage() {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [allPlans, setAllPlans] = useState<Plan[]>([]);
 
+  // Plan request state
+  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+  const [requestMessage, setRequestMessage] = useState('');
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [requestSuccess, setRequestSuccess] = useState(false);
+  const [requestError, setRequestError] = useState('');
+
   useEffect(() => {
     const loadData = async () => {
       if (user) {
@@ -90,6 +97,37 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error updating profile:', error);
     }
+  };
+
+  const handlePlanRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !selectedPlanId) return;
+
+    setRequestError('');
+
+    try {
+      await apiClient.createPlanRequest({
+        userId: user.id,
+        planId: selectedPlanId,
+        requestMessage: requestMessage || undefined,
+      });
+
+      setRequestSuccess(true);
+      setShowRequestForm(false);
+      setSelectedPlanId(null);
+      setRequestMessage('');
+
+      setTimeout(() => setRequestSuccess(false), 5000);
+    } catch (error: any) {
+      console.error('Error submitting plan request:', error);
+      setRequestError(error.message || 'Failed to submit plan request');
+    }
+  };
+
+  const handleSelectPlan = (planId: number) => {
+    setSelectedPlanId(planId);
+    setShowRequestForm(true);
+    setRequestError('');
   };
 
   return (
@@ -359,13 +397,10 @@ export default function SettingsPage() {
                         ) : (
                           <Button
                             variant="outline"
-                            className="w-full"
-                            onClick={() => {
-                              // Scroll to contact section
-                              document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' });
-                            }}
+                            className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                            onClick={() => handleSelectPlan(availablePlan.id)}
                           >
-                            Select Plan
+                            Request This Plan
                           </Button>
                         )}
                       </CardContent>
@@ -375,12 +410,94 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
+            {/* Request Success Message */}
+            {requestSuccess && (
+              <Card className="border-green-200 bg-green-50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-2 text-green-800">
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-medium">Plan activation request submitted successfully!</span>
+                  </div>
+                  <p className="text-sm text-green-700 mt-2">
+                    Our admin will review your request and activate your plan within 24 hours.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Plan Request Form */}
+            {showRequestForm && (
+              <Card id="request-form">
+                <CardHeader>
+                  <CardTitle>Request Plan Activation</CardTitle>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Fill out this form to request activation for your selected plan
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handlePlanRequest} className="space-y-4">
+                    {requestError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="flex items-center gap-2 text-red-800">
+                          <AlertCircle className="h-5 w-5" />
+                          <span className="font-medium">{requestError}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <p className="text-sm text-gray-700">
+                        <strong>Selected Plan:</strong> {allPlans.find(p => p.id === selectedPlanId)?.name}
+                      </p>
+                      <p className="text-sm text-gray-700 mt-1">
+                        <strong>Price:</strong> ₹{allPlans.find(p => p.id === selectedPlanId)?.price} / {allPlans.find(p => p.id === selectedPlanId)?.billingCycle}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="requestMessage">Additional Message (Optional)</Label>
+                      <Textarea
+                        id="requestMessage"
+                        value={requestMessage}
+                        onChange={(e) => setRequestMessage(e.target.value)}
+                        placeholder="Any specific requirements or questions about the plan..."
+                        rows={4}
+                        className="mt-2"
+                      />
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => {
+                          setShowRequestForm(false);
+                          setSelectedPlanId(null);
+                          setRequestMessage('');
+                          setRequestError('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      >
+                        Submit Request
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Contact Information */}
-            <Card id="contact-section">
+            <Card>
               <CardHeader>
-                <CardTitle>Contact Us for Plan Activation</CardTitle>
+                <CardTitle>Need Help?</CardTitle>
                 <p className="text-sm text-gray-600 mt-1">
-                  Interested in upgrading? Reach out to us and we'll activate your chosen plan
+                  Contact us if you have any questions about our plans
                 </p>
               </CardHeader>
               <CardContent>
@@ -392,9 +509,6 @@ export default function SettingsPage() {
                       <a href="mailto:support@printscrap.ai" className="text-blue-600 hover:underline mt-1 block">
                         support@printscrap.ai
                       </a>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Send us an email with your plan choice and we'll get back to you within 24 hours.
-                      </p>
                     </div>
                   </div>
 
@@ -405,18 +519,8 @@ export default function SettingsPage() {
                       <a href="tel:+919876543210" className="text-green-600 hover:underline mt-1 block">
                         +91 98765 43210
                       </a>
-                      <p className="text-sm text-gray-600 mt-2">
-                        Call us during business hours (9 AM - 6 PM IST) for instant assistance.
-                      </p>
                     </div>
                   </div>
-                </div>
-
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-                  <p className="text-sm text-gray-700">
-                    <strong>Note:</strong> After selecting a plan, contact us with your company name and desired plan.
-                    Our admin will activate your subscription within 24 hours.
-                  </p>
                 </div>
               </CardContent>
             </Card>

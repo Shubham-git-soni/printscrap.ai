@@ -5,6 +5,15 @@ import { connectDB } from '@/lib/db-config';
 export async function GET() {
   try {
     const pool = await connectDB();
+
+    // Auto-update expired subscriptions
+    await pool.request().query(`
+      UPDATE Subscriptions
+      SET status = 'expired'
+      WHERE endDate < CAST(GETDATE() AS DATE)
+        AND status IN ('active', 'trial')
+    `);
+
     const result = await pool.request().query(`
       SELECT
         u.id,
@@ -29,8 +38,10 @@ export async function GET() {
       ORDER BY u.createdAt DESC
     `);
 
+    await pool.close();
     return NextResponse.json({ success: true, data: result.recordset });
   } catch (error: any) {
+    console.error('❌ Users fetch error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }
@@ -79,7 +90,7 @@ export async function PUT(request: Request) {
         WHERE id = @id
       `);
 
-
+    await pool.close();
 
     if (result.recordset.length === 0) {
       return NextResponse.json(
@@ -117,13 +128,16 @@ export async function DELETE(request: Request) {
         .query('DELETE FROM Users WHERE id = @id');
 
       await transaction.commit();
+      await pool.close();
 
       return NextResponse.json({ success: true });
     } catch (err) {
       await transaction.rollback();
+      await pool.close();
       throw err;
     }
   } catch (error: any) {
+    console.error('❌ User delete error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }

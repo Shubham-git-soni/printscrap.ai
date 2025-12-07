@@ -6,7 +6,6 @@ import { DashboardLayout } from '@/components/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiClient } from '@/lib/api-client';
 import { User } from '@/lib/types';
@@ -197,7 +196,7 @@ export default function ClientsPage() {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex items-center justify-end gap-2">
                             <Button
                               variant={client.isActive ? 'destructive' : 'default'}
                               size="sm"
@@ -205,15 +204,13 @@ export default function ClientsPage() {
                             >
                               {client.isActive ? 'Deactivate' : 'Activate'}
                             </Button>
-                            {!client.isVerified && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleToggleVerified(client.id, client.isVerified)}
-                              >
-                                Verify Email
-                              </Button>
-                            )}
+                            <Button
+                              variant={client.isVerified ? 'outline' : 'default'}
+                              size="sm"
+                              onClick={() => handleToggleVerified(client.id, client.isVerified)}
+                            >
+                              {client.isVerified ? 'Unverify' : 'Verify'}
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

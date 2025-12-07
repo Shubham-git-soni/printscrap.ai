@@ -9,6 +9,14 @@ export async function GET(request: Request) {
 
     const pool = await connectDB();
 
+    // Auto-update expired subscriptions
+    await pool.request().query(`
+      UPDATE Subscriptions
+      SET status = 'expired'
+      WHERE endDate < CAST(GETDATE() AS DATE)
+        AND status IN ('active', 'trial')
+    `);
+
     if (userId) {
       const result = await pool.request()
         .input('userId', sql.Int, parseInt(userId))
@@ -31,6 +39,7 @@ export async function GET(request: Request) {
           ORDER BY s.id DESC
         `);
 
+      await pool.close();
       return NextResponse.json({ success: true, data: result.recordset[0] || null });
     } else {
       const result = await pool.request().query(`
@@ -51,9 +60,11 @@ export async function GET(request: Request) {
         ORDER BY s.id DESC
       `);
 
+      await pool.close();
       return NextResponse.json({ success: true, data: result.recordset });
     }
   } catch (error: any) {
+    console.error('❌ Subscriptions fetch error:', error);
     return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }

@@ -252,14 +252,47 @@ export const apiClient = {
       method: 'POST',
       body: JSON.stringify(planData),
     }),
+  updatePlan: (id: number, planData: any) =>
+    apiFetch(`/plans?id=${id}`, { method: 'PUT', body: JSON.stringify(planData) }),
   deletePlan: (planId: number) =>
     apiFetch(`/plans?id=${planId}`, {
       method: 'DELETE',
     }),
 
+  // Subscription Activation
+  activateSubscription: (data: { userId: number; planId: number }) =>
+    apiFetch('/subscriptions/activate', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
   // Subscriptions
   getSubscription: (userId: number) => apiFetch(`/subscriptions?userId=${userId}`),
   checkTrialExpired: (userId: number) => apiFetch(`/check-trial?userId=${userId}`),
+
+  // Plan Activation Requests
+  getPlanRequests: (filters?: { userId?: number; status?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.userId) params.append('userId', filters.userId.toString());
+    if (filters?.status) params.append('status', filters.status);
+    const queryString = params.toString();
+    return apiFetch(`/plan-requests${queryString ? `?${queryString}` : ''}`);
+  },
+  createPlanRequest: (data: { userId: number; planId: number; requestMessage?: string }) =>
+    apiFetch('/plan-requests', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  approvePlanRequest: (requestId: number, data: { approvedBy: number; approvalNotes?: string }) =>
+    apiFetch(`/plan-requests/${requestId}/approve`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  rejectPlanRequest: (requestId: number, data: { approvedBy: number; approvalNotes?: string }) =>
+    apiFetch(`/plan-requests/${requestId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
   // Users (Super Admin)
   getUsers: () => apiFetch('/users'),

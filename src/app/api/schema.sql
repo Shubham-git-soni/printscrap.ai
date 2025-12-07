@@ -160,6 +160,22 @@ CREATE TABLE SaleItems (
     FOREIGN KEY (subCategoryId) REFERENCES SubCategories(id)
 );
 
+-- PlanActivationRequests Table
+CREATE TABLE PlanActivationRequests (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    userId INT NOT NULL,
+    planId INT NOT NULL,
+    status NVARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    requestMessage NVARCHAR(MAX),
+    requestedAt DATETIME DEFAULT GETDATE(),
+    approvedBy INT NULL,
+    approvalNotes NVARCHAR(MAX) NULL,
+    approvedAt DATETIME NULL,
+    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE CASCADE,
+    FOREIGN KEY (planId) REFERENCES Plans(id),
+    FOREIGN KEY (approvedBy) REFERENCES Users(id)
+);
+
 -- Insert Default Super Admin
 INSERT INTO Users (email, password, role, companyName, isActive, isVerified)
 VALUES ('admin@printscrap.ai', 'admin123', 'super_admin', 'PrintScrap.ai', 1, 1);

@@ -22,7 +22,7 @@ export interface Plan {
   name: string;
   description: string;
   price: number;
-  billingCycle: 'monthly' | 'yearly';
+  billingCycle: 'daily' | 'monthly' | 'yearly';
   features: string[];
 }
 

@@ -14,6 +14,7 @@ import {
   Users,
   CreditCard,
   CalendarDays,
+  Bell,
   LogOut
 } from 'lucide-react';
 
@@ -29,6 +30,7 @@ const clientLinks = [
 const superAdminLinks = [
   { href: '/super-admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/super-admin/clients', label: 'Clients', icon: Users },
+  { href: '/super-admin/plan-requests', label: 'Plan Requests', icon: Bell },
   { href: '/super-admin/plans', label: 'Plans', icon: CreditCard },
   { href: '/super-admin/subscriptions', label: 'Subscriptions', icon: CalendarDays },
 ];

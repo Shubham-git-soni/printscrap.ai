@@ -19,16 +19,14 @@ export default function SubscriptionsPage() {
   const [clients, setClients] = useState<User[]>([]);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
 
-  const [newSubscription, setNewSubscription] = useState({
-    userId: '',
-    planId: '',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: '',
-    status: 'active' as 'active' | 'trial' | 'expired' | 'cancelled',
-    autoRenew: true,
-  });
+  // Activation modal state
+  const [showActivationModal, setShowActivationModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<User | null>(null);
+  const [selectedPlanId, setSelectedPlanId] = useState('');
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [endDate, setEndDate] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -46,19 +44,50 @@ export default function SubscriptionsPage() {
       setPlans(allPlans as Plan[]);
 
       // Build subscriptions from user data (users already include subscription info)
-      const enhancedSubs = clientUsers
-        .filter((u: any) => u.subscriptionId)
-        .map((user: any) => ({
-          id: user.subscriptionId,
+      // Show ALL clients, even those without active subscriptions
+      const enhancedSubs = clientUsers.map((user: any) => {
+        let status = user.subscriptionStatus || 'trial'; // Default to trial for new registrations
+
+        // Check if subscription is expired
+        if (user.subscriptionEndDate) {
+          const endDate = new Date(user.subscriptionEndDate);
+          const currentDate = new Date();
+
+          // Set time to start of day for accurate comparison
+          endDate.setHours(0, 0, 0, 0);
+          currentDate.setHours(0, 0, 0, 0);
+
+          // If end date has passed or is today, and status is trial or active, mark as expired
+          if (endDate <= currentDate && (status === 'active' || status === 'trial')) {
+            status = 'expired';
+          }
+        } else if (!user.subscriptionId) {
+          // No subscription at all - treat as trial that needs to be checked
+          const createdDate = new Date(user.createdAt);
+          const currentDate = new Date();
+          const oneDayLater = new Date(createdDate);
+          oneDayLater.setDate(oneDayLater.getDate() + 1);
+
+          // If more than 1 day since registration, mark as expired
+          if (currentDate > oneDayLater) {
+            status = 'expired';
+          } else {
+            status = 'trial';
+          }
+        }
+
+        return {
+          id: user.subscriptionId || 0,
           userId: user.id,
           planId: 0,
-          status: user.subscriptionStatus || 'active',
-          startDate: user.createdAt,
-          endDate: user.subscriptionEndDate,
+          status: status,
+          startDate: user.startDate || user.createdAt,
+          endDate: user.endDate || new Date(new Date(user.createdAt).setDate(new Date(user.createdAt).getDate() + 1)).toISOString(),
           autoRenew: false,
           user: user,
-          plan: (allPlans as any[]).find((p: any) => p.name === user.planName),
-        }));
+          plan: user.planName ? (allPlans as any[]).find((p: any) => p.name === user.planName) : null,
+        };
+      });
 
       setSubscriptions(enhancedSubs);
     } catch (error) {
@@ -66,23 +95,100 @@ export default function SubscriptionsPage() {
     }
   };
 
-  const handleAddSubscription = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const selectedPlan = plans.find(p => p.id === parseInt(newSubscription.planId));
-    if (!selectedPlan) return;
-
-    // Create subscription API not implemented yet
-    console.warn('Create subscription API not implemented');
-    alert('Subscription management features are not yet implemented in the backend.');
-
-    setShowAddForm(false);
+  const handleActivatePlan = (client: User) => {
+    setSelectedClient(client);
+    setSelectedPlanId('');
+    setStartDate(new Date().toISOString().split('T')[0]);
+    setEndDate('');
+    setShowActivationModal(true);
   };
 
-  const handleUpdateStatus = (_subId: number, _newStatus: 'active' | 'trial' | 'expired' | 'cancelled') => {
-    // Update subscription API not implemented yet
-    console.warn('Update subscription API not implemented');
-    alert('Subscription status update is not yet implemented in the backend.');
+  const handlePlanSelection = (planId: string) => {
+    setSelectedPlanId(planId);
+
+    // Auto-fill start date with current date and calculate end date based on billing cycle
+    const plan = plans.find(p => p.id === parseInt(planId));
+    if (plan) {
+      const currentDate = new Date();
+      const start = new Date(currentDate);
+      let end = new Date(currentDate);
+
+      switch (plan.billingCycle) {
+        case 'daily':
+          end.setDate(end.getDate() + 1);
+          break;
+        case 'monthly':
+          end.setMonth(end.getMonth() + 1);
+          break;
+        case 'yearly':
+          end.setFullYear(end.getFullYear() + 1);
+          break;
+        default:
+          end.setMonth(end.getMonth() + 1);
+      }
+
+      setStartDate(start.toISOString().split('T')[0]);
+      setEndDate(end.toISOString().split('T')[0]);
+    }
+  };
+
+  const handleStartDateChange = (date: string) => {
+    setStartDate(date);
+
+    // Recalculate end date if plan is selected
+    if (selectedPlanId) {
+      const plan = plans.find(p => p.id === parseInt(selectedPlanId));
+      if (plan) {
+        const start = new Date(date);
+        let end = new Date(start);
+
+        switch (plan.billingCycle) {
+          case 'daily':
+            end.setDate(end.getDate() + 1);
+            break;
+          case 'monthly':
+            end.setMonth(end.getMonth() + 1);
+            break;
+          case 'yearly':
+            end.setFullYear(end.getFullYear() + 1);
+            break;
+          default:
+            end.setMonth(end.getMonth() + 1);
+        }
+
+        setEndDate(end.toISOString().split('T')[0]);
+      }
+    }
+  };
+
+  const handleSubmitActivation = async () => {
+    if (!selectedClient || !selectedPlanId) {
+      alert('Please select a plan');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await apiClient.activateSubscription({
+        userId: selectedClient.id,
+        planId: parseInt(selectedPlanId),
+      });
+
+      alert('Plan activated successfully!');
+      setShowActivationModal(false);
+      setSelectedClient(null);
+      setSelectedPlanId('');
+      setStartDate(new Date().toISOString().split('T')[0]);
+      setEndDate('');
+
+      // Reload data
+      await loadData();
+    } catch (error: any) {
+      console.error('Error activating subscription:', error);
+      alert('Failed to activate plan: ' + (error.message || 'Unknown error'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredSubscriptions = subscriptions.filter(sub => {
@@ -97,15 +203,9 @@ export default function SubscriptionsPage() {
   return (
     <DashboardLayout requiredRole="super_admin">
       <div className="p-8">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Subscription Management</h1>
-            <p className="text-gray-600 mt-1">Manage client subscriptions</p>
-          </div>
-          <Button onClick={() => setShowAddForm(!showAddForm)}>
-            <Plus className="h-4 w-4 mr-2" />
-            {showAddForm ? 'Cancel' : 'Add Subscription'}
-          </Button>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Subscription Management</h1>
+          <p className="text-gray-600 mt-1">View all client subscriptions and activate plans</p>
         </div>
 
         {/* Stats Cards */}
@@ -152,109 +252,6 @@ export default function SubscriptionsPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Add Subscription Form */}
-        {showAddForm && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Create New Subscription</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleAddSubscription} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="userId">Client *</Label>
-                    <Select
-                      id="userId"
-                      value={newSubscription.userId}
-                      onChange={(e) => setNewSubscription({ ...newSubscription, userId: e.target.value })}
-                      required
-                    >
-                      <option value="">Select Client</option>
-                      {clients.map(client => (
-                        <option key={client.id} value={client.id}>
-                          {client.companyName} ({client.email})
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="planId">Plan *</Label>
-                    <Select
-                      id="planId"
-                      value={newSubscription.planId}
-                      onChange={(e) => setNewSubscription({ ...newSubscription, planId: e.target.value })}
-                      required
-                    >
-                      <option value="">Select Plan</option>
-                      {plans.map(plan => (
-                        <option key={plan.id} value={plan.id}>
-                          {plan.name} - Rs.{plan.price}/{plan.billingCycle}
-                        </option>
-                      ))}
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="startDate">Start Date *</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={newSubscription.startDate}
-                      onChange={(e) => setNewSubscription({ ...newSubscription, startDate: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="endDate">End Date *</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={newSubscription.endDate}
-                      onChange={(e) => setNewSubscription({ ...newSubscription, endDate: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="status">Status *</Label>
-                    <Select
-                      id="status"
-                      value={newSubscription.status}
-                      onChange={(e) => setNewSubscription({ ...newSubscription, status: e.target.value as any })}
-                      required
-                    >
-                      <option value="active">Active</option>
-                      <option value="trial">Trial</option>
-                      <option value="expired">Expired</option>
-                      <option value="cancelled">Cancelled</option>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center pt-6">
-                    <input
-                      type="checkbox"
-                      id="autoRenew"
-                      checked={newSubscription.autoRenew}
-                      onChange={(e) => setNewSubscription({ ...newSubscription, autoRenew: e.target.checked })}
-                      className="mr-2"
-                    />
-                    <Label htmlFor="autoRenew" className="mb-0">Auto Renew</Label>
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <Button type="submit">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Subscription
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Search */}
         <Card className="mb-6">
@@ -319,6 +316,7 @@ export default function SubscriptionsPage() {
                           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                             sub.status === 'active' ? 'bg-green-100 text-green-700' :
                             sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                            sub.status === 'expired' ? 'bg-red-100 text-red-700' :
                             sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                             'bg-yellow-100 text-yellow-700'
                           }`}>
@@ -333,16 +331,15 @@ export default function SubscriptionsPage() {
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Select
-                            value={sub.status}
-                            onChange={(e) => handleUpdateStatus(sub.id, e.target.value as any)}
-                            className="w-32"
-                          >
-                            <option value="active">Active</option>
-                            <option value="trial">Trial</option>
-                            <option value="expired">Expired</option>
-                            <option value="cancelled">Cancelled</option>
-                          </Select>
+                          {sub.user && (
+                            <Button
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700"
+                              onClick={() => handleActivatePlan(sub.user as User)}
+                            >
+                              Activate Plan
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -352,6 +349,122 @@ export default function SubscriptionsPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Activation Modal */}
+        {showActivationModal && selectedClient && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-lg bg-white shadow-xl">
+              <CardHeader className="border-b border-gray-200">
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  Activate Plan - {selectedClient.companyName}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">Client:</span>
+                    <span className="text-sm text-gray-900 ml-2">{selectedClient.companyName}</span>
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-gray-700">Email:</span>
+                    <span className="text-sm text-gray-900 ml-2">{selectedClient.email}</span>
+                  </div>
+                  {selectedClient.contactNumber && (
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Contact:</span>
+                      <span className="text-sm text-gray-900 ml-2">{selectedClient.contactNumber}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="planSelect" className="text-sm font-semibold text-gray-900">
+                    Select Plan <span className="text-red-500">*</span>
+                  </Label>
+                  <select
+                    id="planSelect"
+                    value={selectedPlanId}
+                    onChange={(e) => handlePlanSelection(e.target.value)}
+                    className="w-full mt-2 px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 text-sm"
+                  >
+                    <option value="">Choose a plan...</option>
+                    {plans.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {plan.name} - Rs.{plan.price}/{plan.billingCycle}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="startDate" className="text-sm font-semibold text-gray-900">
+                      Start Date <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => handleStartDateChange(e.target.value)}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="endDate" className="text-sm font-semibold text-gray-900">
+                      End Date <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="endDate"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+
+                {selectedPlanId && (
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <p className="text-sm text-blue-900 font-medium">
+                      Selected Plan: {plans.find(p => p.id === parseInt(selectedPlanId))?.name}
+                    </p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Duration: {startDate} to {endDate}
+                    </p>
+                    <p className="text-xs text-blue-600 mt-2">
+                      Billing Cycle: {plans.find(p => p.id === parseInt(selectedPlanId))?.billingCycle}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    onClick={() => {
+                      setShowActivationModal(false);
+                      setSelectedClient(null);
+                      setSelectedPlanId('');
+                      setStartDate(new Date().toISOString().split('T')[0]);
+                      setEndDate('');
+                    }}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleSubmitActivation}
+                    disabled={!selectedPlanId || loading}
+                  >
+                    {loading ? 'Activating...' : 'Activate Plan'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
