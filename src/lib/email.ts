@@ -200,3 +200,67 @@ export async function sendPlanActivationEmail(
     throw new Error('Failed to send activation email');
   }
 }
+
+// Send plan rejection notification to client
+export async function sendPlanRejectionEmail(
+  to: string,
+  clientName: string,
+  planName: string,
+  rejectionReason?: string
+) {
+  const transporter = createTransporter();
+
+  const mailOptions = {
+    from: `"PrintScrap.ai" <${process.env.SMTP_USER}>`,
+    to,
+    subject: `Plan Request Update - ${planName}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+            .info-box { background: white; padding: 15px; border-left: 4px solid #dc2626; margin: 20px 0; }
+            .button { display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+            .footer { text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Plan Request Update</h1>
+            </div>
+            <div class="content">
+              <h2>Hello ${clientName},</h2>
+              <p>We regret to inform you that your subscription plan request could not be approved at this time.</p>
+
+              <div class="info-box">
+                <p><strong>Requested Plan:</strong> ${planName}</p>
+                ${rejectionReason ? `<p><strong>Reason:</strong> ${rejectionReason}</p>` : ''}
+              </div>
+
+              <p>If you have any questions or would like to discuss alternative options, please don't hesitate to contact our support team.</p>
+              <p>You can also request a different plan through your account settings.</p>
+              <a href="${process.env.NEXT_PUBLIC_APP_URL}/client/settings" class="button" style="display: inline-block; background: #2563eb; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Plans</a>
+            </div>
+            <div class="footer">
+              <p>&copy; 2025 PrintScrap.ai. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('✅ Plan rejection email sent to:', to);
+    return { success: true };
+  } catch (error: any) {
+    console.error('❌ Error sending plan rejection email:', error);
+    throw new Error('Failed to send rejection email');
+  }
+}

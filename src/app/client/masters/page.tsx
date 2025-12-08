@@ -508,43 +508,45 @@ export default function MastersPage() {
                 <CardTitle className="text-foreground">Categories List ({categories.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Market Rate</TableHead>
-                      <TableHead>Unit</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {categories.map((cat) => (
-                      <TableRow key={cat.id}>
-                        <TableCell className="font-medium">{cat.name}</TableCell>
-                        <TableCell>Rs.{cat.marketRate}</TableCell>
-                        <TableCell>{cat.unit}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditCategory(cat)}
-                            >
-                              <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteCategory(cat.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Market Rate</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {categories.map((cat) => (
+                        <TableRow key={cat.id}>
+                          <TableCell className="font-medium">{cat.name}</TableCell>
+                          <TableCell>Rs.{cat.marketRate}</TableCell>
+                          <TableCell>{cat.unit}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditCategory(cat)}
+                              >
+                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteCategory(cat.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -644,48 +646,50 @@ export default function MastersPage() {
                 <CardTitle className="text-foreground">Sub-Categories List ({subCategories.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Size</TableHead>
-                      <TableHead>Unit</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {subCategories.map((sub) => {
-                      const cat = categories.find(c => c.id === sub.categoryId);
-                      return (
-                        <TableRow key={sub.id}>
-                          <TableCell className="font-medium">{cat?.name}</TableCell>
-                          <TableCell>{sub.name}</TableCell>
-                          <TableCell>{sub.size || '-'}</TableCell>
-                          <TableCell>{sub.unit}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditSubCategory(sub)}
-                              >
-                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteSubCategory(sub.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Category</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Size</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {subCategories.map((sub) => {
+                        const cat = categories.find(c => c.id === sub.categoryId);
+                        return (
+                          <TableRow key={sub.id}>
+                            <TableCell className="font-medium">{cat?.name}</TableCell>
+                            <TableCell>{sub.name}</TableCell>
+                            <TableCell>{sub.size || '-'}</TableCell>
+                            <TableCell>{sub.unit}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditSubCategory(sub)}
+                                >
+                                  <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteSubCategory(sub.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -745,41 +749,43 @@ export default function MastersPage() {
                 <CardTitle className="text-foreground">Units List ({units.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Symbol</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {units.map((unit) => (
-                      <TableRow key={unit.id}>
-                        <TableCell className="font-medium">{unit.name}</TableCell>
-                        <TableCell>{unit.symbol}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditUnit(unit)}
-                            >
-                              <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteUnit(unit.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Symbol</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {units.map((unit) => (
+                        <TableRow key={unit.id}>
+                          <TableCell className="font-medium">{unit.name}</TableCell>
+                          <TableCell>{unit.symbol}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditUnit(unit)}
+                              >
+                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteUnit(unit.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -838,41 +844,43 @@ export default function MastersPage() {
                 <CardTitle className="text-foreground">Departments List ({departments.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {departments.map((dept) => (
-                      <TableRow key={dept.id}>
-                        <TableCell className="font-medium">{dept.name}</TableCell>
-                        <TableCell>{dept.description || '-'}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEditDepartment(dept)}
-                            >
-                              <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDeleteDepartment(dept.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {departments.map((dept) => (
+                        <TableRow key={dept.id}>
+                          <TableCell className="font-medium">{dept.name}</TableCell>
+                          <TableCell>{dept.description || '-'}</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditDepartment(dept)}
+                              >
+                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteDepartment(dept.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -956,48 +964,50 @@ export default function MastersPage() {
                 <CardTitle className="text-foreground">Machines List ({machines.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Department</TableHead>
-                      <TableHead>Model</TableHead>
-                      <TableHead>Manufacturer</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {machines.map((machine) => {
-                      const dept = departments.find(d => d.id === machine.departmentId);
-                      return (
-                        <TableRow key={machine.id}>
-                          <TableCell className="font-medium">{machine.name}</TableCell>
-                          <TableCell>{dept?.name}</TableCell>
-                          <TableCell>{machine.model || '-'}</TableCell>
-                          <TableCell>{machine.manufacturer || '-'}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleEditMachine(machine)}
-                              >
-                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteMachine(machine.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
+                <div className="overflow-x-auto max-h-[400px] overflow-y-auto border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Model</TableHead>
+                        <TableHead>Manufacturer</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {machines.map((machine) => {
+                        const dept = departments.find(d => d.id === machine.departmentId);
+                        return (
+                          <TableRow key={machine.id}>
+                            <TableCell className="font-medium">{machine.name}</TableCell>
+                            <TableCell>{dept?.name}</TableCell>
+                            <TableCell>{machine.model || '-'}</TableCell>
+                            <TableCell>{machine.manufacturer || '-'}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditMachine(machine)}
+                                >
+                                  <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleDeleteMachine(machine.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </div>

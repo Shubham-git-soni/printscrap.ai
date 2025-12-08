@@ -621,45 +621,47 @@ export default function ScrapEntryPage() {
             {recentEntries.length === 0 ? (
               <p className="text-center text-gray-500 dark:text-gray-400 py-8">No entries yet. Add your first scrap entry above.</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Job Number</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Sub-Category</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Machine</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Rate</TableHead>
-                    <TableHead>Total Value</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentEntries.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell>{new Date(entry.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${entry.entryType === 'job-based'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-                          : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                          }`}>
-                          {entry.entryType}
-                        </span>
-                      </TableCell>
-                      <TableCell>{entry.jobNumber || '-'}</TableCell>
-                      <TableCell className="font-medium">{getCategoryName(entry.categoryId)}</TableCell>
-                      <TableCell>{getSubCategoryName(entry.subCategoryId)}</TableCell>
-                      <TableCell>{getDepartmentName(entry.departmentId)}</TableCell>
-                      <TableCell>{getMachineName(entry.machineId)}</TableCell>
-                      <TableCell>{entry.quantity} {entry.unit}</TableCell>
-                      <TableCell>Rs.{entry.rate}</TableCell>
-                      <TableCell className="font-semibold">Rs.{(entry.totalValue || 0).toFixed(2)}</TableCell>
+              <div className="overflow-x-auto max-h-[400px] overflow-y-auto border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Job Number</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Sub-Category</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>Machine</TableHead>
+                      <TableHead>Quantity</TableHead>
+                      <TableHead>Rate</TableHead>
+                      <TableHead>Total Value</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {recentEntries.map((entry) => (
+                      <TableRow key={entry.id}>
+                        <TableCell>{new Date(entry.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${entry.entryType === 'job-based'
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                            : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
+                            }`}>
+                            {entry.entryType}
+                          </span>
+                        </TableCell>
+                        <TableCell>{entry.jobNumber || '-'}</TableCell>
+                        <TableCell className="font-medium">{getCategoryName(entry.categoryId)}</TableCell>
+                        <TableCell>{getSubCategoryName(entry.subCategoryId)}</TableCell>
+                        <TableCell>{getDepartmentName(entry.departmentId)}</TableCell>
+                        <TableCell>{getMachineName(entry.machineId)}</TableCell>
+                        <TableCell>{entry.quantity} {entry.unit}</TableCell>
+                        <TableCell>Rs.{entry.rate}</TableCell>
+                        <TableCell className="font-semibold">Rs.{(entry.totalValue || 0).toFixed(2)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { apiClient } from '@/lib/api-client';
 import { Bell, CheckCircle, XCircle, Clock, Search, Filter } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface PlanRequest {
   id: number;
@@ -105,9 +106,10 @@ export default function PlanRequestsPage() {
       setSelectedRequest(null);
       setApprovalNotes('');
       await loadRequests();
+      toast.success('Plan request approved successfully! Client has been notified via email.');
     } catch (error) {
       console.error('Error approving request:', error);
-      alert('Failed to approve request. Please try again.');
+      toast.error('Failed to approve request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -127,9 +129,10 @@ export default function PlanRequestsPage() {
       setSelectedRequest(null);
       setApprovalNotes('');
       await loadRequests();
+      toast.success('Plan request rejected. Client has been notified via email.');
     } catch (error) {
       console.error('Error rejecting request:', error);
-      alert('Failed to reject request. Please try again.');
+      toast.error('Failed to reject request. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -233,7 +236,7 @@ export default function PlanRequestsPage() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
                 <Table>
                   <TableHeader>
                     <TableRow>

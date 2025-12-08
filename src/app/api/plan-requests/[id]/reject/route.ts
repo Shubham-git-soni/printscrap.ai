@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import sql from 'mssql';
 import { connectDB } from '@/lib/db-config';
+import { sendPlanRejectionEmail } from '@/lib/email';
 
 // POST - Reject plan activation request
 export async function POST(
@@ -25,8 +26,10 @@ export async function POST(
     const requestResult = await pool.request()
       .input('requestId', sql.Int, requestId)
       .query(`
-        SELECT * FROM PlanActivationRequests
-        WHERE id = @requestId AND status = 'pending'
+        SELECT par.*, p.name as planName
+        FROM PlanActivationRequests par
+        LEFT JOIN Plans p ON par.planId = p.id
+        WHERE par.id = @requestId AND par.status = 'pending'
       `);
 
     if (requestResult.recordset.length === 0) {
@@ -35,6 +38,8 @@ export async function POST(
         { status: 404 }
       );
     }
+
+    const planRequest = requestResult.recordset[0];
 
     // Update request status to rejected
     await pool.request()
@@ -50,6 +55,25 @@ export async function POST(
             approvedAt = @approvedAt
         WHERE id = @requestId
       `);
+
+    // Get user details for email
+    const userResult = await pool.request()
+      .input('userId', sql.Int, planRequest.userId)
+      .query('SELECT email, companyName FROM Users WHERE id = @userId');
+
+    // Send rejection email to client (async, don't wait)
+    if (userResult.recordset.length > 0) {
+      const user = userResult.recordset[0];
+
+      sendPlanRejectionEmail(
+        user.email,
+        user.companyName,
+        planRequest.planName,
+        approvalNotes
+      ).catch(err => {
+        console.error('❌ Failed to send rejection email:', err);
+      });
+    }
 
     return NextResponse.json({
       success: true,

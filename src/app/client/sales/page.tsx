@@ -699,28 +699,30 @@ export default function SalesPage() {
 
                         <div className="border-t dark:border-gray-700 pt-4">
                           <p className="text-sm font-semibold mb-2 text-foreground">Items Sold:</p>
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Sub-Category</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Rate</TableHead>
-                                <TableHead>Total</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {sale.saleItems.map((item, idx) => (
-                                <TableRow key={idx}>
-                                  <TableCell>{getCategoryName(item.categoryId)}</TableCell>
-                                  <TableCell>{getSubCategoryName(item.subCategoryId)}</TableCell>
-                                  <TableCell>{item.quantity}</TableCell>
-                                  <TableCell>Rs.{item.rate}</TableCell>
-                                  <TableCell>Rs.{item.totalValue.toFixed(2)}</TableCell>
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Category</TableHead>
+                                  <TableHead>Sub-Category</TableHead>
+                                  <TableHead>Quantity</TableHead>
+                                  <TableHead>Rate</TableHead>
+                                  <TableHead>Total</TableHead>
                                 </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+                              </TableHeader>
+                              <TableBody>
+                                {sale.saleItems.map((item, idx) => (
+                                  <TableRow key={idx}>
+                                    <TableCell>{getCategoryName(item.categoryId)}</TableCell>
+                                    <TableCell>{getSubCategoryName(item.subCategoryId)}</TableCell>
+                                    <TableCell>{item.quantity}</TableCell>
+                                    <TableCell>Rs.{item.rate}</TableCell>
+                                    <TableCell>Rs.{item.totalValue.toFixed(2)}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
                         </div>
 
                         {sale.remarks && (
