@@ -57,21 +57,29 @@ export default function SuperAdminDashboard() {
       setRecentClients(recent);
 
       // Recent subscriptions with user and plan info (from users data)
+      // Show clients who have either subscriptionId or subscriptionStatus
       const recentSubs = clients
-        .filter((u: any) => u.subscriptionEndDate)
-        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .filter((u: any) => u.subscriptionId || u.subscriptionStatus || u.planName)
+        .sort((a: any, b: any) => {
+          // Sort by subscription start date or creation date
+          const dateA = new Date(a.subscriptionStartDate || a.createdAt).getTime();
+          const dateB = new Date(b.subscriptionStartDate || b.createdAt).getTime();
+          return dateB - dateA;
+        })
         .slice(0, 5)
-      .map((user: any) => ({
-        id: user.subscriptionId,
-        userId: user.id,
-        planId: 0,
-        status: user.subscriptionStatus,
-        startDate: user.createdAt,
-        endDate: user.subscriptionEndDate,
-        autoRenew: false,
-        user: user,
-        plan: (plans as any[]).find((p: any) => p.name === user.planName),
-      }));
+        .map((user: any) => ({
+          id: user.subscriptionId || user.id,
+          userId: user.id,
+          planId: 0,
+          status: user.subscriptionStatus || 'trial',
+          startDate: user.subscriptionStartDate || user.createdAt,
+          endDate: user.subscriptionEndDate || null,
+          autoRenew: false,
+          user: user,
+          plan: (plans as any[]).find((p: any) => p.name === user.planName),
+        }));
+
+      console.log('Recent Subscriptions:', recentSubs);
       setRecentSubscriptions(recentSubs);
     } catch (error) {
       console.error('Error loading super admin dashboard data:', error);
@@ -81,66 +89,61 @@ export default function SuperAdminDashboard() {
   return (
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
-        <div className="mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Super Admin Dashboard</h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">Welcome back, {user?.companyName}!</p>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Super Admin Dashboard</h1>
         </div>
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6 mb-4 md:mb-8">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Total Clients
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Clients
               </CardTitle>
-              <Users className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+              <Users className="h-3 w-3 md:h-5 md:w-5 text-blue-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{stats.totalClients}</div>
-              <p className="text-xs text-gray-500 mt-1 hidden md:block">{stats.activeClients} active</p>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">{stats.totalClients}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Active Subscriptions
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Active Subs
               </CardTitle>
-              <CreditCard className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
+              <CreditCard className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{stats.activeSubscriptions}</div>
-              <p className="text-xs text-gray-500 mt-1 hidden md:block">Current active plans</p>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">{stats.activeSubscriptions}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Monthly Revenue
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Revenue
               </CardTitle>
-              <IndianRupee className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
+              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-purple-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
-              <p className="text-xs text-gray-500 mt-1 hidden md:block">From active subscriptions</p>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Conversion Rate
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Conversion
               </CardTitle>
-              <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
+              <TrendingUp className="h-3 w-3 md:h-5 md:w-5 text-orange-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">
                 {stats.totalClients > 0
                   ? ((stats.activeSubscriptions / stats.totalClients) * 100).toFixed(1)
                   : 0}%
               </div>
-              <p className="text-xs text-gray-500 mt-1 hidden md:block">Clients with subscriptions</p>
             </CardContent>
           </Card>
         </div>
@@ -201,9 +204,9 @@ export default function SuperAdminDashboard() {
                       <div className="text-right">
                         <p className="font-semibold text-green-600">₹{sub.plan?.price || 0}</p>
                         <span className={`inline-flex px-2 py-1 mt-1 rounded-full text-xs font-medium ${sub.status === 'active' ? 'bg-green-100 text-green-700' :
-                            sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                              sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                'bg-yellow-100 text-yellow-700'
+                          sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                            sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                              'bg-yellow-100 text-yellow-700'
                           }`}>
                           {sub.status}
                         </span>

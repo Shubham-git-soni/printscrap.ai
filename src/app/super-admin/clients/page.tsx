@@ -66,78 +66,73 @@ export default function ClientsPage() {
   return (
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
-        <div className="mb-6 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Client Management</h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">Manage all registered clients</p>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Client Management</h1>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+        <div className="grid grid-cols-3 gap-2 md:gap-6 mb-4 md:mb-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Total Clients
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Clients
               </CardTitle>
-              <Users className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
+              <Users className="h-3 w-3 md:h-5 md:w-5 text-blue-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{clients.length}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">{clients.length}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Active Clients
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Active
               </CardTitle>
-              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
+              <CheckCircle className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">
                 {clients.filter(c => c.isActive).length}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="col-span-2 md:col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Verified Clients
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Verified
               </CardTitle>
-              <Mail className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
+              <Mail className="h-3 w-3 md:h-5 md:w-5 text-purple-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">
                 {clients.filter(c => c.isVerified).length}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Search */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                className="pl-10"
-                placeholder="Search by company name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Clients Table */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                All Clients ({filteredClients.length})
-              </CardTitle>
-              <ViewToggle view={viewMode} onViewChange={setViewMode} />
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  All Clients ({filteredClients.length})
+                </CardTitle>
+                <ViewToggle view={viewMode} onViewChange={setViewMode} />
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  className="pl-10"
+                  placeholder="Search by company name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -152,16 +147,16 @@ export default function ClientsPage() {
               <>
                 {/* Grid/Table View */}
                 <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
-                  <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
+                  <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
                     <Table>
-                      <TableHeader className="sticky top-0 bg-white z-10">
+                      <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                         <TableRow>
-                          <TableHead>Company Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Registered</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Email Verified</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
+                          <TableHead className="bg-gray-50">Company Name</TableHead>
+                          <TableHead className="bg-gray-50">Email</TableHead>
+                          <TableHead className="bg-gray-50">Registered</TableHead>
+                          <TableHead className="bg-gray-50">Status</TableHead>
+                          <TableHead className="bg-gray-50">Email Verified</TableHead>
+                          <TableHead className="text-right bg-gray-50">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -211,15 +206,17 @@ export default function ClientsPage() {
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-2">
                                 <Button
-                                  variant={client.isActive ? 'destructive' : 'default'}
+                                  variant="ghost"
                                   size="sm"
+                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700"
                                   onClick={() => handleToggleActive(client.id, client.isActive)}
                                 >
                                   {client.isActive ? 'Deactivate' : 'Activate'}
                                 </Button>
                                 <Button
-                                  variant={client.isVerified ? 'outline' : 'default'}
+                                  variant="ghost"
                                   size="sm"
+                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700"
                                   onClick={() => handleToggleVerified(client.id, client.isVerified)}
                                 >
                                   {client.isVerified ? 'Unverify' : 'Verify'}
@@ -234,7 +231,7 @@ export default function ClientsPage() {
                 </div>
 
                 {/* Card View */}
-                <div className={`${viewMode === 'card' ? 'block' : 'hidden'} space-y-4 max-h-[600px] overflow-y-auto`}>
+                <div className={`${viewMode === 'card' ? 'block' : 'hidden'} space-y-4 max-h-[500px] overflow-y-auto border rounded-lg p-4`}>
                   {filteredClients.map(client => (
                     <Card key={client.id}>
                       <CardContent className="pt-6">
@@ -293,17 +290,17 @@ export default function ClientsPage() {
                           </div>
                           <div className="flex gap-2 pt-2">
                             <Button
-                              variant={client.isActive ? 'destructive' : 'default'}
+                              variant="ghost"
                               size="sm"
-                              className="flex-1"
+                              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
                               onClick={() => handleToggleActive(client.id, client.isActive)}
                             >
                               {client.isActive ? 'Deactivate' : 'Activate'}
                             </Button>
                             <Button
-                              variant={client.isVerified ? 'outline' : 'default'}
+                              variant="ghost"
                               size="sm"
-                              className="flex-1"
+                              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
                               onClick={() => handleToggleVerified(client.id, client.isVerified)}
                             >
                               {client.isVerified ? 'Unverify' : 'Verify'}

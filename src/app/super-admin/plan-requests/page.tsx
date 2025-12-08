@@ -142,46 +142,45 @@ export default function PlanRequestsPage() {
   return (
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
-        <div className="mb-6 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Plan Activation Requests</h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">Review and manage client plan activation requests</p>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Plan Activation Requests</h1>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+        <div className="grid grid-cols-3 gap-2 md:gap-6 mb-4 md:mb-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
-                Pending Requests
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+                Pending
               </CardTitle>
-              <Clock className="h-4 w-4 md:h-5 md:w-5 text-yellow-600" />
+              <Clock className="h-3 w-3 md:h-5 md:w-5 text-yellow-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{pendingCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">{pendingCount}</div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
                 Approved
               </CardTitle>
-              <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-600" />
+              <CheckCircle className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{approvedCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">{approvedCount}</div>
             </CardContent>
           </Card>
 
-          <Card className="col-span-2 md:col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
                 Rejected
               </CardTitle>
-              <XCircle className="h-4 w-4 md:h-5 md:w-5 text-red-600" />
+              <XCircle className="h-3 w-3 md:h-5 md:w-5 text-red-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{rejectedCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold">{rejectedCount}</div>
             </CardContent>
           </Card>
         </div>
@@ -271,13 +270,12 @@ export default function PlanRequestsPage() {
                         </TableCell>
                         <TableCell>
                           <span
-                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              request.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-700'
-                                : request.status === 'approved'
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${request.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : request.status === 'approved'
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-red-100 text-red-700'
-                            }`}
+                              }`}
                           >
                             {request.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
                             {request.status === 'approved' && <CheckCircle className="h-3 w-3 mr-1" />}

@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sidebar } from './Sidebar';
+import { MobileFooter } from './MobileFooter';
 import { TrialExpiredModal } from '@/components/TrialExpiredModal';
 import { apiClient } from '@/lib/api-client';
 import { Plan } from '@/lib/types';
-import { Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { User, LogOut } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,13 +17,27 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [showTrialExpired, setShowTrialExpired] = useState(false);
   const [isTrialExpired, setIsTrialExpired] = useState(false);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -42,10 +58,10 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
       // Check trial expiration for clients
       if (!isLoading && user && user.role === 'client') {
         try {
-          const trialStatus = await apiClient.checkTrialExpired(user.id);
+          const trialStatus = await apiClient.checkTrialExpired(user.id) as { isExpired: boolean };
           if (trialStatus.isExpired) {
             setIsTrialExpired(true);
-            const allPlans = await apiClient.getPlans();
+            const allPlans = await apiClient.getPlans() as Plan[];
             setPlans(allPlans);
 
             // Only redirect to dashboard/settings if trial expired
@@ -85,17 +101,64 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <main className="flex-1 overflow-y-auto bg-gray-50">
-        {/* Mobile header with hamburger menu */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-4">
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        isDesktopCollapsed={desktopSidebarCollapsed}
+        onDesktopToggle={() => setDesktopSidebarCollapsed(!desktopSidebarCollapsed)}
+      />
+      <main className={cn(
+        "flex-1 overflow-y-auto bg-gray-50 pb-20 lg:pb-0 transition-all duration-300",
+        desktopSidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
+      )}>
+        {/* Desktop toggle button - shown when sidebar is collapsed */}
+        {desktopSidebarCollapsed && (
           <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={() => setDesktopSidebarCollapsed(false)}
+            className="hidden lg:block fixed top-4 left-4 z-40 p-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors shadow-lg"
+            title="Open sidebar"
           >
-            <Menu className="h-6 w-6 text-gray-700" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
+        )}
+
+        {/* Mobile header with profile icon */}
+        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
           <h1 className="text-lg font-semibold text-gray-900">PrintScrap.ai</h1>
+
+          {/* Profile Icon with Dropdown */}
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+            >
+              <User className="h-5 w-5" />
+            </button>
+
+            {/* Profile Dropdown Menu */}
+            {showProfileMenu && (
+              <div className="absolute right-0 top-12 w-64 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
+                  <p className="text-xs text-gray-500 capitalize mt-1">{user?.role?.replace('_', ' ')}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="text-sm font-medium">Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
         {shouldBlockAccess ? (
           <div className="p-8">
@@ -143,6 +206,9 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
           children
         )}
       </main>
+
+      {/* Mobile Footer Navigation */}
+      <MobileFooter onMenuClick={() => setSidebarOpen(true)} />
 
       {/* Trial Expired Modal */}
       {showTrialExpired && (

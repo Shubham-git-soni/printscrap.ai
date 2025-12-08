@@ -92,8 +92,7 @@ export default function PlansPage() {
       <div className="p-4 md:p-8">
         <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Plan Management</h1>
-            <p className="text-sm md:text-base text-gray-600 mt-1">Create and manage subscription plans</p>
+            <h1 className="text-lg md:text-xl font-bold text-gray-900">Plan Management</h1>
           </div>
           <Button
             onClick={() => setShowAddForm(!showAddForm)}

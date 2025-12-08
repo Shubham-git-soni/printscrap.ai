@@ -385,54 +385,54 @@ export default function MastersPage() {
   return (
     <DashboardLayout requiredRole="client">
       <div className="p-4 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6">Masters</h1>
+        <h1 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Masters</h1>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b overflow-x-auto">
+        <div className="flex gap-2 mb-4 md:mb-6 overflow-x-auto pb-1">
           <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'unit'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'unit'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('unit')}
           >
             Units
           </button>
           <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'department'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'department'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('department')}
           >
-            Departments
+            Dept
           </button>
           <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'machine'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'machine'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('machine')}
           >
             Machines
           </button>
           <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'category'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'category'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('category')}
           >
-            Categories
+            Category
           </button>
           <button
-            className={`pb-3 px-4 font-medium whitespace-nowrap ${activeTab === 'subcategory'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'subcategory'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('subcategory')}
           >
-            Sub-Categories
+            Sub-Cat
           </button>
         </div>
 

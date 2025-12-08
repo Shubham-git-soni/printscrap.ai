@@ -361,10 +361,9 @@ export default function SalesPage() {
 
   return (
     <DashboardLayout requiredRole="client">
-      <div className="p-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Sales</h1>
-          <p className="text-gray-600 mt-1">Manage scrap sales and checkout</p>
+      <div className="p-3 md:p-6 lg:p-8">
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Sales</h1>
         </div>
 
         {/* Success Message */}
@@ -383,26 +382,26 @@ export default function SalesPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b">
+        <div className="flex gap-2 mb-4 md:mb-6">
           <button
-            className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'new-sale'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'new-sale'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('new-sale')}
           >
-            <ShoppingCart className="h-4 w-4" />
+            <ShoppingCart className="h-3.5 w-3.5 md:h-4 md:w-4" />
             New Sale
           </button>
           <button
-            className={`pb-3 px-4 font-medium flex items-center gap-2 ${activeTab === 'history'
-              ? 'border-b-2 border-primary text-primary'
-              : 'text-gray-500 hover:text-gray-700'
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'history'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             onClick={() => setActiveTab('history')}
           >
-            <Receipt className="h-4 w-4" />
-            Sales History
+            <Receipt className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            History
           </button>
         </div>
 

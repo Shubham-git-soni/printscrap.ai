@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ViewToggle } from '@/components/ui/view-toggle';
 import { apiClient } from '@/lib/api-client';
 import { Subscription, User, Plan } from '@/lib/types';
 import { CreditCard, Search, Bell, CheckCircle, XCircle } from 'lucide-react';
@@ -38,6 +39,7 @@ export default function SubscriptionsPage() {
   const [planRequests, setPlanRequests] = useState<PlanRequest[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'requests' | 'subscriptions'>('requests');
+  const [viewMode, setViewMode] = useState<'grid' | 'card'>('grid');
 
   // Modals state
   const [showApproveModal, setShowApproveModal] = useState(false);
@@ -250,111 +252,101 @@ export default function SubscriptionsPage() {
   return (
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
-        <div className="mb-6 md:mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Subscription Management</h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">Manage plan requests and view all client subscriptions</p>
+        <div className="mb-4 md:mb-6">
+          <h1 className="text-lg md:text-xl font-bold text-gray-900">Subscription Management</h1>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6 mb-4 md:mb-6">
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('requests')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Pending Requests</CardTitle>
-              <Bell className="h-4 w-4 md:h-5 md:w-5 text-yellow-600" />
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Pending</CardTitle>
+              <Bell className="h-3 w-3 md:h-5 md:w-5 text-yellow-600" />
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-yellow-600">{pendingCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold text-yellow-600">{pendingCount}</div>
             </CardContent>
           </Card>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Active</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Active</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-green-600">{activeCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold text-green-600">{activeCount}</div>
             </CardContent>
           </Card>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Trial</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Trial</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-blue-600">{trialCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold text-blue-600">{trialCount}</div>
             </CardContent>
           </Card>
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium text-gray-600">Expired</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Expired</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-lg md:text-2xl font-bold text-red-600">{expiredCount}</div>
+            <CardContent className="p-2 md:p-6 pt-0">
+              <div className="text-sm md:text-2xl font-bold text-red-600">{expiredCount}</div>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab('requests')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'requests'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        <div className="mb-4 md:mb-6 flex gap-2">
+          <button
+            onClick={() => setActiveTab('requests')}
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium text-xs md:text-sm flex items-center gap-1.5 md:gap-2 transition-all ${activeTab === 'requests'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
-            >
-              <div className="flex items-center gap-2">
-                <Bell className="h-4 w-4" />
-                Plan Requests
-                {pendingCount > 0 && (
-                  <span className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded-full">
-                    {pendingCount}
-                  </span>
-                )}
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab('subscriptions')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'subscriptions'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          >
+            <Bell className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            Requests
+            {pendingCount > 0 && (
+              <span className="bg-yellow-400 text-yellow-900 text-[10px] md:text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                {pendingCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('subscriptions')}
+            className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium text-xs md:text-sm flex items-center gap-1.5 md:gap-2 transition-all ${activeTab === 'subscriptions'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
-            >
-              <div className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" />
-                All Subscriptions
-              </div>
-            </button>
-          </nav>
+          >
+            <CreditCard className="h-3.5 w-3.5 md:h-4 md:w-4" />
+            All Subs
+          </button>
         </div>
-
-        {/* Search */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                className="pl-10"
-                placeholder={activeTab === 'requests' ? 'Search plan requests...' : 'Search subscriptions...'}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Plan Requests Tab */}
         {activeTab === 'requests' && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Plan Requests ({filteredRequests.length})
-              </CardTitle>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Bell className="h-5 w-5" />
+                    Plan Requests ({filteredRequests.length})
+                  </CardTitle>
+                  <ViewToggle view={viewMode} onViewChange={setViewMode} />
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    className="pl-10"
+                    placeholder="Search plan requests..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {filteredRequests.length === 0 ? (
@@ -363,51 +355,110 @@ export default function SubscriptionsPage() {
                   <p className="text-gray-500">No pending plan requests</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead>Plan</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Message</TableHead>
-                        <TableHead>Requested</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredRequests.map((request) => (
-                        <TableRow key={request.id}>
-                          <TableCell>
+                <>
+                  {/* Grid/Table View */}
+                  <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                          <TableRow>
+                            <TableHead className="bg-gray-50">Client</TableHead>
+                            <TableHead className="bg-gray-50">Contact</TableHead>
+                            <TableHead className="bg-gray-50">Plan</TableHead>
+                            <TableHead className="bg-gray-50">Price</TableHead>
+                            <TableHead className="bg-gray-50">Message</TableHead>
+                            <TableHead className="bg-gray-50">Requested</TableHead>
+                            <TableHead className="text-right bg-gray-50">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredRequests.map((request) => (
+                            <TableRow key={request.id}>
+                              <TableCell>
+                                <div>
+                                  <p className="font-medium">{request.clientName}</p>
+                                  <p className="text-sm text-gray-500">{request.clientEmail}</p>
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <p className="text-sm">{request.clientContact || 'N/A'}</p>
+                              </TableCell>
+                              <TableCell>
+                                <p className="font-medium">{request.planName}</p>
+                              </TableCell>
+                              <TableCell>
+                                <p className="font-medium">₹{request.planPrice}</p>
+                                <p className="text-xs text-gray-500">/{request.billingCycle}</p>
+                              </TableCell>
+                              <TableCell>
+                                <p className="text-sm text-gray-600 max-w-xs truncate" title={request.requestMessage}>
+                                  {request.requestMessage || 'No message'}
+                                </p>
+                              </TableCell>
+                              <TableCell>
+                                {new Date(request.requestedAt).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-2">
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-600 hover:bg-green-700"
+                                    onClick={() => handleApprove(request)}
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    Approve
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    onClick={() => handleReject(request)}
+                                  >
+                                    <XCircle className="h-4 w-4 mr-1" />
+                                    Reject
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  {/* Card View */}
+                  <div className={`${viewMode === 'card' ? 'block' : 'hidden'} space-y-4 max-h-[500px] overflow-y-auto border rounded-lg p-4`}>
+                    {filteredRequests.map((request) => (
+                      <Card key={request.id}>
+                        <CardContent className="pt-6">
+                          <div className="space-y-3">
                             <div>
-                              <p className="font-medium">{request.clientName}</p>
+                              <p className="text-sm text-gray-600">Client</p>
+                              <p className="font-semibold">{request.clientName}</p>
                               <p className="text-sm text-gray-500">{request.clientEmail}</p>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <p className="text-sm">{request.clientContact || 'N/A'}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p className="font-medium">{request.planName}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p className="font-medium">₹{request.planPrice}</p>
-                            <p className="text-xs text-gray-500">/{request.billingCycle}</p>
-                          </TableCell>
-                          <TableCell>
-                            <p className="text-sm text-gray-600 max-w-xs truncate" title={request.requestMessage}>
-                              {request.requestMessage || 'No message'}
-                            </p>
-                          </TableCell>
-                          <TableCell>
-                            {new Date(request.requestedAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm text-gray-600">Contact</p>
+                                <p className="text-sm">{request.clientContact || 'N/A'}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">Requested</p>
+                                <p className="text-sm">{new Date(request.requestedAt).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Plan</p>
+                              <p className="font-medium">{request.planName}</p>
+                              <p className="text-sm text-gray-500">₹{request.planPrice}/{request.billingCycle}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Message</p>
+                              <p className="text-sm">{request.requestMessage || 'No message'}</p>
+                            </div>
+                            <div className="flex gap-2 pt-2">
                               <Button
                                 size="sm"
-                                className="bg-green-600 hover:bg-green-700"
+                                className="flex-1 bg-green-600 hover:bg-green-700"
                                 onClick={() => handleApprove(request)}
                               >
                                 <CheckCircle className="h-4 w-4 mr-1" />
@@ -416,18 +467,19 @@ export default function SubscriptionsPage() {
                               <Button
                                 size="sm"
                                 variant="destructive"
+                                className="flex-1"
                                 onClick={() => handleReject(request)}
                               >
                                 <XCircle className="h-4 w-4 mr-1" />
                                 Reject
                               </Button>
                             </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -437,10 +489,24 @@ export default function SubscriptionsPage() {
         {activeTab === 'subscriptions' && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                All Subscriptions ({filteredSubscriptions.length})
-              </CardTitle>
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    All Subscriptions ({filteredSubscriptions.length})
+                  </CardTitle>
+                  <ViewToggle view={viewMode} onViewChange={setViewMode} />
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    className="pl-10"
+                    placeholder="Search subscriptions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {filteredSubscriptions.length === 0 ? (
@@ -451,57 +517,114 @@ export default function SubscriptionsPage() {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Plan</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Start Date</TableHead>
-                        <TableHead>End Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Auto Renew</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredSubscriptions.map(sub => (
-                        <TableRow key={sub.id || sub.userId}>
-                          <TableCell className="font-medium">
+                <>
+                  {/* Grid/Table View */}
+                  <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                          <TableRow>
+                            <TableHead className="bg-gray-50">Client</TableHead>
+                            <TableHead className="bg-gray-50">Plan</TableHead>
+                            <TableHead className="bg-gray-50">Price</TableHead>
+                            <TableHead className="bg-gray-50">Start Date</TableHead>
+                            <TableHead className="bg-gray-50">End Date</TableHead>
+                            <TableHead className="bg-gray-50">Status</TableHead>
+                            <TableHead className="bg-gray-50">Auto Renew</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredSubscriptions.map(sub => (
+                            <TableRow key={sub.id || sub.userId}>
+                              <TableCell className="font-medium">
+                                <div>
+                                  <p>{sub.user?.companyName || 'Unknown'}</p>
+                                  <p className="text-sm text-gray-500">{sub.user?.email || ''}</p>
+                                </div>
+                              </TableCell>
+                              <TableCell>{sub.plan?.name || 'No Plan'}</TableCell>
+                              <TableCell className="font-semibold">
+                                {sub.plan ? `₹${sub.plan.price}` : 'N/A'}
+                              </TableCell>
+                              <TableCell>{new Date(sub.startDate).toLocaleDateString()}</TableCell>
+                              <TableCell>{new Date(sub.endDate).toLocaleDateString()}</TableCell>
+                              <TableCell>
+                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${sub.status === 'active' ? 'bg-green-100 text-green-700' :
+                                  sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                                    sub.status === 'expired' ? 'bg-red-100 text-red-700' :
+                                      sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                        'bg-yellow-100 text-yellow-700'
+                                  }`}>
+                                  {sub.status}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${sub.autoRenew ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                                  }`}>
+                                  {sub.autoRenew ? 'Yes' : 'No'}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+
+                  {/* Card View */}
+                  <div className={`${viewMode === 'card' ? 'block' : 'hidden'} space-y-4 max-h-[500px] overflow-y-auto border rounded-lg p-4`}>
+                    {filteredSubscriptions.map(sub => (
+                      <Card key={sub.id || sub.userId}>
+                        <CardContent className="pt-6">
+                          <div className="space-y-3">
                             <div>
-                              <p>{sub.user?.companyName || 'Unknown'}</p>
+                              <p className="text-sm text-gray-600">Client</p>
+                              <p className="font-semibold">{sub.user?.companyName || 'Unknown'}</p>
                               <p className="text-sm text-gray-500">{sub.user?.email || ''}</p>
                             </div>
-                          </TableCell>
-                          <TableCell>{sub.plan?.name || 'No Plan'}</TableCell>
-                          <TableCell className="font-semibold">
-                            {sub.plan ? `₹${sub.plan.price}` : 'N/A'}
-                          </TableCell>
-                          <TableCell>{new Date(sub.startDate).toLocaleDateString()}</TableCell>
-                          <TableCell>{new Date(sub.endDate).toLocaleDateString()}</TableCell>
-                          <TableCell>
-                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                              sub.status === 'active' ? 'bg-green-100 text-green-700' :
-                              sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                              sub.status === 'expired' ? 'bg-red-100 text-red-700' :
-                              sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                              'bg-yellow-100 text-yellow-700'
-                            }`}>
-                              {sub.status}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                              sub.autoRenew ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                            }`}>
-                              {sub.autoRenew ? 'Yes' : 'No'}
-                            </span>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                            <div>
+                              <p className="text-sm text-gray-600">Plan</p>
+                              <p className="font-medium">{sub.plan?.name || 'No Plan'}</p>
+                              <p className="text-sm text-gray-500">
+                                {sub.plan ? `₹${sub.plan.price}` : 'N/A'}
+                              </p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm text-gray-600">Start Date</p>
+                                <p className="text-sm">{new Date(sub.startDate).toLocaleDateString()}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">End Date</p>
+                                <p className="text-sm">{new Date(sub.endDate).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm text-gray-600">Status</p>
+                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${sub.status === 'active' ? 'bg-green-100 text-green-700' :
+                                  sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
+                                    sub.status === 'expired' ? 'bg-red-100 text-red-700' :
+                                      sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                        'bg-yellow-100 text-yellow-700'
+                                  }`}>
+                                  {sub.status}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">Auto Renew</p>
+                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${sub.autoRenew ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                                  }`}>
+                                  {sub.autoRenew ? 'Yes' : 'No'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
