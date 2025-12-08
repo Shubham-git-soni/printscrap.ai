@@ -90,56 +90,56 @@ export default function SuperAdminDashboard() {
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Super Admin Dashboard</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Super Admin Dashboard</h1>
         </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6 mb-4 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Clients
               </CardTitle>
-              <Users className="h-3 w-3 md:h-5 md:w-5 text-blue-600" />
+              <Users className="h-3 w-3 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{stats.totalClients}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{stats.totalClients}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Active Subs
               </CardTitle>
-              <CreditCard className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
+              <CreditCard className="h-3 w-3 md:h-5 md:w-5 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{stats.activeSubscriptions}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{stats.activeSubscriptions}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Revenue
               </CardTitle>
-              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-purple-600" />
+              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-purple-600 dark:text-purple-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">₹{stats.totalRevenue.toLocaleString()}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Conversion
               </CardTitle>
-              <TrendingUp className="h-3 w-3 md:h-5 md:w-5 text-orange-600" />
+              <TrendingUp className="h-3 w-3 md:h-5 md:w-5 text-orange-600 dark:text-orange-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">
+              <div className="text-sm md:text-2xl font-bold text-foreground">
                 {stats.totalClients > 0
                   ? ((stats.activeSubscriptions / stats.totalClients) * 100).toFixed(1)
                   : 0}%
@@ -152,27 +152,27 @@ export default function SuperAdminDashboard() {
           {/* Recent Clients */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Clients</CardTitle>
+              <CardTitle className="text-foreground">Recent Clients</CardTitle>
             </CardHeader>
             <CardContent>
               {recentClients.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No clients yet</p>
+                <p className="text-center text-muted-foreground py-8">No clients yet</p>
               ) : (
                 <div className="space-y-4">
                   {recentClients.map(client => (
-                    <div key={client.id} className="flex items-center justify-between border-b pb-3">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900">{client.companyName}</p>
-                        <p className="text-sm text-gray-500">{client.email}</p>
+                    <div key={client.id} className="flex items-center justify-between gap-3 border-b pb-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground truncate">{client.companyName}</p>
+                        <p className="text-sm text-muted-foreground truncate">{client.email}</p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex-shrink-0">
                         {client.isActive ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 whitespace-nowrap">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Active
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 whitespace-nowrap">
                             <XCircle className="h-3 w-3 mr-1" />
                             Inactive
                           </span>
@@ -188,25 +188,25 @@ export default function SuperAdminDashboard() {
           {/* Recent Subscriptions */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Subscriptions</CardTitle>
+              <CardTitle className="text-foreground">Recent Subscriptions</CardTitle>
             </CardHeader>
             <CardContent>
               {recentSubscriptions.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No subscriptions yet</p>
+                <p className="text-center text-muted-foreground py-8">No subscriptions yet</p>
               ) : (
                 <div className="space-y-4">
                   {recentSubscriptions.map(sub => (
                     <div key={sub.id} className="flex items-center justify-between border-b pb-3">
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{sub.user?.companyName || 'Unknown'}</p>
-                        <p className="text-sm text-gray-500">{sub.plan?.name || 'N/A'}</p>
+                        <p className="font-medium text-foreground">{sub.user?.companyName || 'Unknown'}</p>
+                        <p className="text-sm text-muted-foreground">{sub.plan?.name || 'N/A'}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-green-600">₹{sub.plan?.price || 0}</p>
-                        <span className={`inline-flex px-2 py-1 mt-1 rounded-full text-xs font-medium ${sub.status === 'active' ? 'bg-green-100 text-green-700' :
-                          sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                            sub.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                              'bg-yellow-100 text-yellow-700'
+                        <p className="font-semibold text-green-600 dark:text-green-400">₹{sub.plan?.price || 0}</p>
+                        <span className={`inline-flex px-2 py-1 mt-1 rounded-full text-xs font-medium ${sub.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                          sub.status === 'trial' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                            sub.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
+                              'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
                           }`}>
                           {sub.status}
                         </span>

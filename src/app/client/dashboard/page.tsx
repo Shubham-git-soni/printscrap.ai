@@ -100,56 +100,56 @@ export default function ClientDashboard() {
     <DashboardLayout requiredRole="client">
       <div className="p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Dashboard</h1>
         </div>
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6 mb-4 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Est. Value
               </CardTitle>
-              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
+              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">₹{stats.totalScrapValue.toLocaleString()}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">₹{stats.totalScrapValue.toLocaleString()}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Revenue
               </CardTitle>
-              <TrendingUp className="h-3 w-3 md:h-5 md:w-5 text-blue-600" />
+              <TrendingUp className="h-3 w-3 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">Rs.{stats.totalRevenue.toLocaleString()}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">Rs.{stats.totalRevenue.toLocaleString()}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Weight
               </CardTitle>
-              <Weight className="h-3 w-3 md:h-5 md:w-5 text-orange-600" />
+              <Weight className="h-3 w-3 md:h-5 md:w-5 text-orange-600 dark:text-orange-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{stats.totalStockWeight.toFixed(1)} Kg</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{stats.totalStockWeight.toFixed(1)} Kg</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Items
               </CardTitle>
-              <Package className="h-3 w-3 md:h-5 md:w-5 text-purple-600" />
+              <Package className="h-3 w-3 md:h-5 md:w-5 text-purple-600 dark:text-purple-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{stats.totalStockCount}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{stats.totalStockCount}</div>
             </CardContent>
           </Card>
         </div>
@@ -159,11 +159,11 @@ export default function ClientDashboard() {
           {/* Category Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Scrap by Category</CardTitle>
+              <CardTitle className="text-foreground">Scrap by Category</CardTitle>
             </CardHeader>
             <CardContent>
               {categoryData.length === 0 ? (
-                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
                   No category data available
                 </div>
               ) : (
@@ -183,8 +183,14 @@ export default function ClientDashboard() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => `₹${value}`} />
-                    <Legend />
+                    <Tooltip
+                      formatter={(value) => `₹${value}`}
+                      contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
+                      labelStyle={{ color: 'var(--foreground)' }}
+                    />
+                    <Legend
+                      wrapperStyle={{ color: 'var(--foreground)' }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}
@@ -194,21 +200,32 @@ export default function ClientDashboard() {
           {/* Weekly Volume */}
           <Card>
             <CardHeader>
-              <CardTitle>Weekly Volume (Kg/Day)</CardTitle>
+              <CardTitle className="text-foreground">Weekly Volume (Kg/Day)</CardTitle>
             </CardHeader>
             <CardContent>
               {weeklyData.length === 0 ? (
-                <div className="h-[300px] flex items-center justify-center text-gray-500">
+                <div className="h-[300px] flex items-center justify-center text-gray-500 dark:text-gray-400">
                   No weekly data available
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={Math.max(300, weeklyData.length * 40)}>
                   <BarChart data={weeklyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip formatter={(value: any) => `${value} Kg`} />
-                    <Legend />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fill: 'var(--foreground)' }}
+                    />
+                    <YAxis
+                      tick={{ fill: 'var(--foreground)' }}
+                    />
+                    <Tooltip
+                      formatter={(value: any) => `${value} Kg`}
+                      contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
+                      labelStyle={{ color: 'var(--foreground)' }}
+                    />
+                    <Legend
+                      wrapperStyle={{ color: 'var(--foreground)' }}
+                    />
                     <Bar dataKey="kg" fill="#3b82f6" name="Weight (Kg)" />
                   </BarChart>
                 </ResponsiveContainer>

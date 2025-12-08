@@ -3,13 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Sidebar } from './Sidebar';
 import { MobileFooter } from './MobileFooter';
 import { TrialExpiredModal } from '@/components/TrialExpiredModal';
 import { apiClient } from '@/lib/api-client';
 import { Plan } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { User, LogOut } from 'lucide-react';
+import { User, LogOut, Moon, Sun } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps) {
   const { user, isLoading, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const [showTrialExpired, setShowTrialExpired] = useState(false);
@@ -108,7 +110,7 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
         onDesktopToggle={() => setDesktopSidebarCollapsed(!desktopSidebarCollapsed)}
       />
       <main className={cn(
-        "flex-1 overflow-y-auto bg-gray-50 pb-20 lg:pb-0 transition-all duration-300",
+        "flex-1 overflow-y-auto bg-background pb-20 lg:pb-0 transition-all duration-300",
         desktopSidebarCollapsed ? "lg:ml-20" : "lg:ml-64"
       )}>
         {/* Desktop toggle button - shown when sidebar is collapsed */}
@@ -127,31 +129,53 @@ export function DashboardLayout({ children, requiredRole }: DashboardLayoutProps
         )}
 
         {/* Mobile header with profile icon */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">PrintScrap.ai</h1>
+        <div className="lg:hidden sticky top-0 z-30 bg-card border-b px-4 py-3 flex items-center justify-between">
+          <h1 className="text-lg font-semibold text-foreground">PrintScrap.ai</h1>
 
           {/* Profile Icon with Dropdown */}
           <div className="relative" ref={profileMenuRef}>
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+              className="p-2 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
             >
               <User className="h-5 w-5" />
             </button>
 
             {/* Profile Dropdown Menu */}
             {showProfileMenu && (
-              <div className="absolute right-0 top-12 w-64 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 truncate">{user?.email}</p>
-                  <p className="text-xs text-gray-500 capitalize mt-1">{user?.role?.replace('_', ' ')}</p>
+              <div className="absolute right-0 top-12 w-64 bg-card border rounded-lg shadow-lg py-2 z-50">
+                <div className="px-4 py-3 border-b">
+                  <p className="text-sm font-medium text-foreground truncate">{user?.email}</p>
+                  <p className="text-xs text-muted-foreground capitalize mt-1">{user?.role?.replace('_', ' ')}</p>
                 </div>
+
+                {/* Theme Toggle for Mobile */}
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-foreground hover:bg-muted transition-colors"
+                >
+                  {theme === 'dark' ? (
+                    <>
+                      <Sun className="h-4 w-4" />
+                      <span className="text-sm font-medium">Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-4 w-4" />
+                      <span className="text-sm font-medium">Dark Mode</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Logout */}
                 <button
                   onClick={() => {
                     setShowProfileMenu(false);
                     logout();
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="text-sm font-medium">Logout</span>

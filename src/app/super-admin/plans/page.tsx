@@ -92,13 +92,14 @@ export default function PlansPage() {
       <div className="p-4 md:p-8">
         <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           <div>
-            <h1 className="text-lg md:text-xl font-bold text-gray-900">Plan Management</h1>
+            <h1 className="text-lg md:text-xl font-bold text-foreground">Plan Management</h1>
           </div>
           <Button
             onClick={() => setShowAddForm(!showAddForm)}
-            className={`w-full md:w-auto ${showAddForm ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700'}`}
+            variant={showAddForm ? "destructive" : "default"}
+            className="w-full md:w-auto"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className={`h-4 w-4 mr-2 ${showAddForm ? 'rotate-45' : ''} transition-transform`} />
             {showAddForm ? 'Cancel' : 'Add New Plan'}
           </Button>
         </div>
@@ -174,7 +175,7 @@ export default function PlansPage() {
                 </div>
 
                 <div className="pt-4">
-                  <Button type="submit" className="w-full bg-emerald-100 hover:bg-emerald-200 text-emerald-700">
+                  <Button type="submit" className="w-full">
                     <Plus className="h-4 w-4 mr-2" />
                     Create Plan
                   </Button>
@@ -188,24 +189,24 @@ export default function PlansPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {plans.length === 0 ? (
             <div className="col-span-full text-center py-12">
-              <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No plans created yet. Add your first plan above.</p>
+              <CreditCard className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <p className="text-gray-500 dark:text-gray-400">No plans created yet. Add your first plan above.</p>
             </div>
           ) : (
             plans.map(plan => (
-              <Card key={plan.id} className="border-2 hover:shadow-lg transition-shadow">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+              <Card key={plan.id} className="border hover:shadow-lg transition-shadow">
+                <CardHeader className="bg-muted/50">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <CardTitle className="text-xl">{plan.name}</CardTitle>
-                      <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
+                      <CardTitle className="text-xl text-foreground">{plan.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(plan.id)}
-                        className="bg-rose-100 hover:bg-rose-200 text-rose-700"
+                        className="bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-900 dark:hover:bg-rose-800 dark:text-rose-300"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -214,17 +215,17 @@ export default function PlansPage() {
                   <div className="mt-4">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-bold text-primary">Rs.{plan.price}</span>
-                      <span className="text-gray-600">/ {plan.billingCycle}</span>
+                      <span className="text-muted-foreground">/ {plan.billingCycle}</span>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="space-y-3">
-                    <p className="text-sm font-semibold text-gray-700">Features:</p>
+                    <p className="text-sm font-semibold text-foreground">Features:</p>
                     <ul className="space-y-2">
                       {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
-                          <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
+                          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                           <span>{feature}</span>
                         </li>
                       ))}

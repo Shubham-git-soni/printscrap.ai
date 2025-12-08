@@ -143,14 +143,14 @@ export default function PlanRequestsPage() {
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Plan Activation Requests</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Plan Activation Requests</h1>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-2 md:gap-6 mb-4 md:mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Pending
               </CardTitle>
               <Clock className="h-3 w-3 md:h-5 md:w-5 text-yellow-600" />
@@ -162,7 +162,7 @@ export default function PlanRequestsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Approved
               </CardTitle>
               <CheckCircle className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
@@ -174,7 +174,7 @@ export default function PlanRequestsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Rejected
               </CardTitle>
               <XCircle className="h-3 w-3 md:h-5 md:w-5 text-red-600" />
@@ -288,7 +288,7 @@ export default function PlanRequestsPage() {
                             <div className="flex items-center justify-end gap-2">
                               <Button
                                 size="sm"
-                                className="bg-green-600 hover:bg-green-700"
+                                className=""
                                 onClick={() => handleApprove(request)}
                               >
                                 Approve
@@ -321,7 +321,7 @@ export default function PlanRequestsPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md bg-white shadow-xl">
               <CardHeader className="border-b border-gray-200">
-                <CardTitle className="text-xl font-bold text-gray-900">
+                <CardTitle className="text-xl font-bold text-foreground">
                   Approve Plan Request
                 </CardTitle>
               </CardHeader>
@@ -329,24 +329,24 @@ export default function PlanRequestsPage() {
                 <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <div>
                     <span className="text-sm font-semibold text-gray-700">Client:</span>
-                    <span className="text-sm text-gray-900 ml-2">{selectedRequest.clientName}</span>
+                    <span className="text-sm text-foreground ml-2">{selectedRequest.clientName}</span>
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-gray-700">Plan:</span>
-                    <span className="text-sm text-gray-900 ml-2">
+                    <span className="text-sm text-foreground ml-2">
                       {selectedRequest.planName} - ₹{selectedRequest.planPrice}/{selectedRequest.billingCycle}
                     </span>
                   </div>
                   {selectedRequest.requestMessage && (
                     <div>
                       <span className="text-sm font-semibold text-gray-700">Message:</span>
-                      <p className="text-sm text-gray-900 mt-1">{selectedRequest.requestMessage}</p>
+                      <p className="text-sm text-foreground mt-1">{selectedRequest.requestMessage}</p>
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="approvalNotes" className="text-sm font-semibold text-gray-900">
+                  <Label htmlFor="approvalNotes" className="text-sm font-semibold text-foreground">
                     Approval Notes (Optional)
                   </Label>
                   <Textarea
@@ -373,7 +373,7 @@ export default function PlanRequestsPage() {
                     Cancel
                   </Button>
                   <Button
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    className="flex-1"
                     onClick={confirmApprove}
                     disabled={loading}
                   >
@@ -390,7 +390,7 @@ export default function PlanRequestsPage() {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <Card className="w-full max-w-md bg-white shadow-xl">
               <CardHeader className="border-b border-gray-200">
-                <CardTitle className="text-xl font-bold text-gray-900">
+                <CardTitle className="text-xl font-bold text-foreground">
                   Reject Plan Request
                 </CardTitle>
               </CardHeader>
@@ -398,18 +398,18 @@ export default function PlanRequestsPage() {
                 <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                   <div>
                     <span className="text-sm font-semibold text-gray-700">Client:</span>
-                    <span className="text-sm text-gray-900 ml-2">{selectedRequest.clientName}</span>
+                    <span className="text-sm text-foreground ml-2">{selectedRequest.clientName}</span>
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-gray-700">Plan:</span>
-                    <span className="text-sm text-gray-900 ml-2">
+                    <span className="text-sm text-foreground ml-2">
                       {selectedRequest.planName} - ₹{selectedRequest.planPrice}/{selectedRequest.billingCycle}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="rejectionNotes" className="text-sm font-semibold text-gray-900">
+                  <Label htmlFor="rejectionNotes" className="text-sm font-semibold text-foreground">
                     Rejection Reason <span className="text-red-500">*</span>
                   </Label>
                   <Textarea

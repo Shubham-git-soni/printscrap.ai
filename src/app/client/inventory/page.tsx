@@ -123,44 +123,44 @@ export default function InventoryPage() {
     <DashboardLayout requiredRole="client">
       <div className="p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Inventory & Stock Ledger</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Inventory & Stock Ledger</h1>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-3 gap-2 md:gap-6 mb-4 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Stock Value
               </CardTitle>
-              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
+              <IndianRupee className="h-3 w-3 md:h-5 md:w-5 text-green-600 dark:text-green-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">Rs.{totalValue.toLocaleString()}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">Rs.{totalValue.toLocaleString()}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Weight
               </CardTitle>
-              <Package className="h-3 w-3 md:h-5 md:w-5 text-blue-600" />
+              <Package className="h-3 w-3 md:h-5 md:w-5 text-blue-600 dark:text-blue-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{totalWeight.toFixed(1)} Kg</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{totalWeight.toFixed(1)} Kg</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600 dark:text-gray-400">
                 Items
               </CardTitle>
-              <Package className="h-3 w-3 md:h-5 md:w-5 text-purple-600" />
+              <Package className="h-3 w-3 md:h-5 md:w-5 text-purple-600 dark:text-purple-400" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{totalItems}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{totalItems}</div>
             </CardContent>
           </Card>
         </div>
@@ -168,31 +168,31 @@ export default function InventoryPage() {
         {/* Category-wise Weight Summary */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <Package className="h-5 w-5" />
               Category-wise Weight Summary
             </CardTitle>
           </CardHeader>
           <CardContent>
             {categoryWiseWeight.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No stock available</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No stock available</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categoryWiseWeight.map((cat, idx) => (
-                  <Card key={idx} className="border bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <Card key={idx} className="border bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 dark:border-gray-700">
                     <CardContent className="pt-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900 text-sm">{cat.name}</h3>
-                        <Package className="h-4 w-4 text-blue-600" />
+                        <h3 className="font-semibold text-foreground text-sm">{cat.name}</h3>
+                        <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="space-y-1">
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">Weight:</span>
-                          <span className="text-lg font-bold text-blue-600">{cat.weight.toFixed(2)} Kg</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400">Weight:</span>
+                          <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{cat.weight.toFixed(2)} Kg</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-600">Value:</span>
-                          <span className="text-sm font-semibold text-green-600">Rs.{cat.value.toFixed(2)}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-400">Value:</span>
+                          <span className="text-sm font-semibold text-green-600 dark:text-green-400">Rs.{cat.value.toFixed(2)}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -210,7 +210,7 @@ export default function InventoryPage() {
               <div>
                 <Label htmlFor="search">Search Stock</Label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                   <Input
                     id="search"
                     className="pl-10"
@@ -260,7 +260,7 @@ export default function InventoryPage() {
         {/* Stock Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <Package className="h-5 w-5" />
               Stock Ledger ({filteredStock.length} items)
             </CardTitle>
@@ -268,8 +268,8 @@ export default function InventoryPage() {
           <CardContent>
             {filteredStock.length === 0 ? (
               <div className="text-center py-12">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">
+                <Package className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">
                   {searchTerm || filterCategory ? 'No stock items match your filters' : 'No stock available. Add scrap entries to build your inventory.'}
                 </p>
               </div>
@@ -282,13 +282,13 @@ export default function InventoryPage() {
                       <TableHead>Sub-Category</TableHead>
                       <TableHead>
                         <div className="flex items-center gap-1">
-                          <TrendingUp className="h-4 w-4 text-green-600" />
+                          <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                           Total Inflow
                         </div>
                       </TableHead>
                       <TableHead>
                         <div className="flex items-center gap-1">
-                          <TrendingDown className="h-4 w-4 text-red-600" />
+                          <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
                           Total Outflow
                         </div>
                       </TableHead>
@@ -304,17 +304,17 @@ export default function InventoryPage() {
                         <TableCell className="font-medium">{getCategoryName(item.categoryId)}</TableCell>
                         <TableCell>{getSubCategoryName(item.subCategoryId)}</TableCell>
                         <TableCell>
-                          <span className="text-green-600 font-medium">
+                          <span className="text-green-600 dark:text-green-400 font-medium">
                             +{item.totalInflow.toFixed(2)}
                           </span>
                         </TableCell>
                         <TableCell>
-                          <span className="text-red-600 font-medium">
+                          <span className="text-red-600 dark:text-red-400 font-medium">
                             -{item.totalOutflow.toFixed(2)}
                           </span>
                         </TableCell>
                         <TableCell>
-                          <span className={`font-semibold ${item.availableStock > 0 ? 'text-blue-600' : 'text-gray-400'
+                          <span className={`font-semibold ${item.availableStock > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'
                             }`}>
                             {item.availableStock.toFixed(2)}
                           </span>
@@ -322,7 +322,7 @@ export default function InventoryPage() {
                         <TableCell>{item.unit}</TableCell>
                         <TableCell>Rs.{(item.averageRate || 0).toFixed(2)}</TableCell>
                         <TableCell className="text-right">
-                          <span className="font-bold text-green-600">
+                          <span className="font-bold text-green-600 dark:text-green-400">
                             Rs.{(item.totalValue || 0).toFixed(2)}
                           </span>
                         </TableCell>
@@ -340,16 +340,16 @@ export default function InventoryPage() {
           <CardContent className="pt-6">
             <div className="flex flex-wrap gap-6 text-sm">
               <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-green-600" />
-                <span className="text-gray-600">Inflow: Scrap entries added to inventory</span>
+                <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-gray-600 dark:text-gray-400">Inflow: Scrap entries added to inventory</span>
               </div>
               <div className="flex items-center gap-2">
-                <TrendingDown className="h-4 w-4 text-red-600" />
-                <span className="text-gray-600">Outflow: Sales deducted from inventory</span>
+                <TrendingDown className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <span className="text-gray-600 dark:text-gray-400">Outflow: Sales deducted from inventory</span>
               </div>
               <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-blue-600" />
-                <span className="text-gray-600">Available Stock: Inflow - Outflow</span>
+                <Package className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-gray-600 dark:text-gray-400">Available Stock: Inflow - Outflow</span>
               </div>
             </div>
           </CardContent>

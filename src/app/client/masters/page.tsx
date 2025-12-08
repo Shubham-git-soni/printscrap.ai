@@ -385,14 +385,14 @@ export default function MastersPage() {
   return (
     <DashboardLayout requiredRole="client">
       <div className="p-4 md:p-8">
-        <h1 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">Masters</h1>
+        <h1 className="text-lg md:text-xl font-bold text-foreground mb-4 md:mb-6">Masters</h1>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 md:mb-6 overflow-x-auto pb-1">
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'unit'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('unit')}
           >
@@ -400,8 +400,8 @@ export default function MastersPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'department'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('department')}
           >
@@ -409,8 +409,8 @@ export default function MastersPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'machine'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('machine')}
           >
@@ -418,8 +418,8 @@ export default function MastersPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'category'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('category')}
           >
@@ -427,8 +427,8 @@ export default function MastersPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium whitespace-nowrap text-xs md:text-sm transition-all ${activeTab === 'subcategory'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('subcategory')}
           >
@@ -441,7 +441,7 @@ export default function MastersPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{editingCategoryId ? 'Edit Category' : 'Add New Category'}</CardTitle>
+                <CardTitle className="text-foreground">{editingCategoryId ? 'Edit Category' : 'Add New Category'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddCategory} className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -486,7 +486,7 @@ export default function MastersPage() {
                   <div className="flex items-end gap-2">
                     {editingCategoryId ? (
                       <>
-                        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" className="flex-1">
                           Update Category
                         </Button>
                         <Button type="button" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50" onClick={handleCancelEditCategory}>
@@ -494,7 +494,7 @@ export default function MastersPage() {
                         </Button>
                       </>
                     ) : (
-                      <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                      <Button type="submit" className="flex-1">
                         <Plus className="h-4 w-4 mr-2" /> Add Category
                       </Button>
                     )}
@@ -505,7 +505,7 @@ export default function MastersPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Categories List ({categories.length})</CardTitle>
+                <CardTitle className="text-foreground">Categories List ({categories.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -530,14 +530,14 @@ export default function MastersPage() {
                               size="sm"
                               onClick={() => handleEditCategory(cat)}
                             >
-                              <Pencil className="h-4 w-4 text-blue-500" />
+                              <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteCategory(cat.id)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
                             </Button>
                           </div>
                         </TableCell>
@@ -555,7 +555,7 @@ export default function MastersPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{editingSubCategoryId ? 'Edit Sub-Category' : 'Add New Sub-Category'}</CardTitle>
+                <CardTitle className="text-foreground">{editingSubCategoryId ? 'Edit Sub-Category' : 'Add New Sub-Category'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddSubCategory} className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -622,7 +622,7 @@ export default function MastersPage() {
                   <div className="flex items-end gap-2">
                     {editingSubCategoryId ? (
                       <>
-                        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" className="flex-1">
                           Update Sub-Category
                         </Button>
                         <Button type="button" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50" onClick={handleCancelEditSubCategory}>
@@ -630,7 +630,7 @@ export default function MastersPage() {
                         </Button>
                       </>
                     ) : (
-                      <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                      <Button type="submit" className="flex-1">
                         <Plus className="h-4 w-4 mr-2" /> Add Sub-Category
                       </Button>
                     )}
@@ -641,7 +641,7 @@ export default function MastersPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Sub-Categories List ({subCategories.length})</CardTitle>
+                <CardTitle className="text-foreground">Sub-Categories List ({subCategories.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -670,14 +670,14 @@ export default function MastersPage() {
                                 size="sm"
                                 onClick={() => handleEditSubCategory(sub)}
                               >
-                                <Pencil className="h-4 w-4 text-blue-500" />
+                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleDeleteSubCategory(sub.id)}
                               >
-                                <Trash2 className="h-4 w-4 text-red-500" />
+                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
                               </Button>
                             </div>
                           </TableCell>
@@ -696,7 +696,7 @@ export default function MastersPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{editingUnitId ? 'Edit Unit' : 'Add New Unit'}</CardTitle>
+                <CardTitle className="text-foreground">{editingUnitId ? 'Edit Unit' : 'Add New Unit'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddUnit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -723,7 +723,7 @@ export default function MastersPage() {
                   <div className="flex items-end gap-2">
                     {editingUnitId ? (
                       <>
-                        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" className="flex-1">
                           Update Unit
                         </Button>
                         <Button type="button" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50" onClick={handleCancelEditUnit}>
@@ -731,7 +731,7 @@ export default function MastersPage() {
                         </Button>
                       </>
                     ) : (
-                      <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                      <Button type="submit" className="flex-1">
                         <Plus className="h-4 w-4 mr-2" /> Add Unit
                       </Button>
                     )}
@@ -742,7 +742,7 @@ export default function MastersPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Units List ({units.length})</CardTitle>
+                <CardTitle className="text-foreground">Units List ({units.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -765,14 +765,14 @@ export default function MastersPage() {
                               size="sm"
                               onClick={() => handleEditUnit(unit)}
                             >
-                              <Pencil className="h-4 w-4 text-blue-500" />
+                              <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteUnit(unit.id)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
                             </Button>
                           </div>
                         </TableCell>
@@ -790,7 +790,7 @@ export default function MastersPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{editingDepartmentId ? 'Edit Department' : 'Add New Department'}</CardTitle>
+                <CardTitle className="text-foreground">{editingDepartmentId ? 'Edit Department' : 'Add New Department'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddDepartment} className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -816,7 +816,7 @@ export default function MastersPage() {
                   <div className="flex items-end gap-2">
                     {editingDepartmentId ? (
                       <>
-                        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" className="flex-1">
                           Update Department
                         </Button>
                         <Button type="button" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50" onClick={handleCancelEditDepartment}>
@@ -824,7 +824,7 @@ export default function MastersPage() {
                         </Button>
                       </>
                     ) : (
-                      <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                      <Button type="submit" className="flex-1">
                         <Plus className="h-4 w-4 mr-2" /> Add Department
                       </Button>
                     )}
@@ -835,7 +835,7 @@ export default function MastersPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Departments List ({departments.length})</CardTitle>
+                <CardTitle className="text-foreground">Departments List ({departments.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -858,14 +858,14 @@ export default function MastersPage() {
                               size="sm"
                               onClick={() => handleEditDepartment(dept)}
                             >
-                              <Pencil className="h-4 w-4 text-blue-500" />
+                              <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteDepartment(dept.id)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
                             </Button>
                           </div>
                         </TableCell>
@@ -883,7 +883,7 @@ export default function MastersPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{editingMachineId ? 'Edit Machine' : 'Add New Machine'}</CardTitle>
+                <CardTitle className="text-foreground">{editingMachineId ? 'Edit Machine' : 'Add New Machine'}</CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddMachine} className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -934,7 +934,7 @@ export default function MastersPage() {
                   <div className="flex items-end md:col-span-2 gap-2">
                     {editingMachineId ? (
                       <>
-                        <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                        <Button type="submit" className="flex-1">
                           Update Machine
                         </Button>
                         <Button type="button" variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50" onClick={handleCancelEditMachine}>
@@ -942,7 +942,7 @@ export default function MastersPage() {
                         </Button>
                       </>
                     ) : (
-                      <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                      <Button type="submit" className="flex-1">
                         <Plus className="h-4 w-4 mr-2" /> Add Machine
                       </Button>
                     )}
@@ -953,7 +953,7 @@ export default function MastersPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Machines List ({machines.length})</CardTitle>
+                <CardTitle className="text-foreground">Machines List ({machines.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -982,14 +982,14 @@ export default function MastersPage() {
                                 size="sm"
                                 onClick={() => handleEditMachine(machine)}
                               >
-                                <Pencil className="h-4 w-4 text-blue-500" />
+                                <Pencil className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleDeleteMachine(machine.id)}
                               >
-                                <Trash2 className="h-4 w-4 text-red-500" />
+                                <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
                               </Button>
                             </div>
                           </TableCell>

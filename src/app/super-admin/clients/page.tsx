@@ -67,32 +67,32 @@ export default function ClientsPage() {
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Client Management</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Client Management</h1>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-2 md:gap-6 mb-4 md:mb-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Clients
               </CardTitle>
               <Users className="h-3 w-3 md:h-5 md:w-5 text-blue-600" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">{clients.length}</div>
+              <div className="text-sm md:text-2xl font-bold text-foreground">{clients.length}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Active
               </CardTitle>
               <CheckCircle className="h-3 w-3 md:h-5 md:w-5 text-green-600" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">
+              <div className="text-sm md:text-2xl font-bold text-foreground">
                 {clients.filter(c => c.isActive).length}
               </div>
             </CardContent>
@@ -100,13 +100,13 @@ export default function ClientsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">
                 Verified
               </CardTitle>
               <Mail className="h-3 w-3 md:h-5 md:w-5 text-purple-600" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
-              <div className="text-sm md:text-2xl font-bold">
+              <div className="text-sm md:text-2xl font-bold text-foreground">
                 {clients.filter(c => c.isVerified).length}
               </div>
             </CardContent>
@@ -139,7 +139,7 @@ export default function ClientsPage() {
             {filteredClients.length === 0 ? (
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">
+                <p className="text-gray-500 dark:text-gray-400">
                   {searchTerm ? 'No clients match your search' : 'No clients registered yet'}
                 </p>
               </div>
@@ -149,14 +149,14 @@ export default function ClientsPage() {
                 <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
                   <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
                     <Table>
-                      <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                      <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
                         <TableRow>
-                          <TableHead className="bg-gray-50">Company Name</TableHead>
-                          <TableHead className="bg-gray-50">Email</TableHead>
-                          <TableHead className="bg-gray-50">Registered</TableHead>
-                          <TableHead className="bg-gray-50">Status</TableHead>
-                          <TableHead className="bg-gray-50">Email Verified</TableHead>
-                          <TableHead className="text-right bg-gray-50">Actions</TableHead>
+                          <TableHead className="bg-muted">Company Name</TableHead>
+                          <TableHead className="bg-muted">Email</TableHead>
+                          <TableHead className="bg-muted">Registered</TableHead>
+                          <TableHead className="bg-muted">Status</TableHead>
+                          <TableHead className="bg-muted">Email Verified</TableHead>
+                          <TableHead className="text-right bg-muted">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -208,7 +208,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                  className="bg-muted hover:bg-muted/80"
                                   onClick={() => handleToggleActive(client.id, client.isActive)}
                                 >
                                   {client.isActive ? 'Deactivate' : 'Activate'}
@@ -216,7 +216,7 @@ export default function ClientsPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+                                  className="bg-muted hover:bg-muted/80"
                                   onClick={() => handleToggleVerified(client.id, client.isVerified)}
                                 >
                                   {client.isVerified ? 'Unverify' : 'Verify'}
@@ -237,16 +237,16 @@ export default function ClientsPage() {
                       <CardContent className="pt-6">
                         <div className="space-y-3">
                           <div>
-                            <p className="text-sm text-gray-600">Company</p>
-                            <p className="font-semibold">{client.companyName}</p>
+                            <p className="text-sm text-muted-foreground">Company</p>
+                            <p className="font-semibold text-foreground">{client.companyName}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-600">Email</p>
+                            <p className="text-sm text-muted-foreground">Email</p>
                             <p className="text-sm">{client.email}</p>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <p className="text-sm text-gray-600">Status</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isActive
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-red-100 text-red-700'
@@ -265,7 +265,7 @@ export default function ClientsPage() {
                               </span>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Email</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Email</p>
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${client.isVerified
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-yellow-100 text-yellow-700'
@@ -285,14 +285,14 @@ export default function ClientsPage() {
                             </div>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-600 mb-2">Registered</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Registered</p>
                             <p className="text-sm">{new Date(client.createdAt).toLocaleDateString()}</p>
                           </div>
                           <div className="flex gap-2 pt-2">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
+                              className="flex-1 bg-muted hover:bg-muted/80"
                               onClick={() => handleToggleActive(client.id, client.isActive)}
                             >
                               {client.isActive ? 'Deactivate' : 'Activate'}
@@ -300,7 +300,7 @@ export default function ClientsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700"
+                              className="flex-1 bg-muted hover:bg-muted/80"
                               onClick={() => handleToggleVerified(client.id, client.isVerified)}
                             >
                               {client.isVerified ? 'Unverify' : 'Verify'}

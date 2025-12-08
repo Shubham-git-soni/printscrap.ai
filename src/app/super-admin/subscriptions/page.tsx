@@ -253,14 +253,14 @@ export default function SubscriptionsPage() {
     <DashboardLayout requiredRole="super_admin">
       <div className="p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Subscription Management</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Subscription Management</h1>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-6 mb-4 md:mb-6">
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('requests')}>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Pending</CardTitle>
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">Pending</CardTitle>
               <Bell className="h-3 w-3 md:h-5 md:w-5 text-yellow-600" />
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
@@ -270,7 +270,7 @@ export default function SubscriptionsPage() {
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Active</CardTitle>
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">Active</CardTitle>
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
               <div className="text-sm md:text-2xl font-bold text-green-600">{activeCount}</div>
@@ -279,7 +279,7 @@ export default function SubscriptionsPage() {
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Trial</CardTitle>
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">Trial</CardTitle>
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
               <div className="text-sm md:text-2xl font-bold text-blue-600">{trialCount}</div>
@@ -288,7 +288,7 @@ export default function SubscriptionsPage() {
 
           <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => setActiveTab('subscriptions')}>
             <CardHeader className="flex flex-row items-center justify-between pb-1 md:pb-2 p-2 md:p-6">
-              <CardTitle className="text-[10px] md:text-sm font-medium text-gray-600">Expired</CardTitle>
+              <CardTitle className="text-[10px] md:text-sm font-medium text-muted-foreground">Expired</CardTitle>
             </CardHeader>
             <CardContent className="p-2 md:p-6 pt-0">
               <div className="text-sm md:text-2xl font-bold text-red-600">{expiredCount}</div>
@@ -301,8 +301,8 @@ export default function SubscriptionsPage() {
           <button
             onClick={() => setActiveTab('requests')}
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium text-xs md:text-sm flex items-center gap-1.5 md:gap-2 transition-all ${activeTab === 'requests'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
           >
             <Bell className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -316,8 +316,8 @@ export default function SubscriptionsPage() {
           <button
             onClick={() => setActiveTab('subscriptions')}
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium text-xs md:text-sm flex items-center gap-1.5 md:gap-2 transition-all ${activeTab === 'subscriptions'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
           >
             <CreditCard className="h-3.5 w-3.5 md:h-4 md:w-4" />
@@ -352,7 +352,7 @@ export default function SubscriptionsPage() {
               {filteredRequests.length === 0 ? (
                 <div className="text-center py-12">
                   <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No pending plan requests</p>
+                  <p className="text-gray-500 dark:text-gray-400">No pending plan requests</p>
                 </div>
               ) : (
                 <>
@@ -360,15 +360,15 @@ export default function SubscriptionsPage() {
                   <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
                     <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
                       <Table>
-                        <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                        <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
                           <TableRow>
-                            <TableHead className="bg-gray-50">Client</TableHead>
-                            <TableHead className="bg-gray-50">Contact</TableHead>
-                            <TableHead className="bg-gray-50">Plan</TableHead>
-                            <TableHead className="bg-gray-50">Price</TableHead>
-                            <TableHead className="bg-gray-50">Message</TableHead>
-                            <TableHead className="bg-gray-50">Requested</TableHead>
-                            <TableHead className="text-right bg-gray-50">Actions</TableHead>
+                            <TableHead className="bg-muted">Client</TableHead>
+                            <TableHead className="bg-muted">Contact</TableHead>
+                            <TableHead className="bg-muted">Plan</TableHead>
+                            <TableHead className="bg-muted">Price</TableHead>
+                            <TableHead className="bg-muted">Message</TableHead>
+                            <TableHead className="bg-muted">Requested</TableHead>
+                            <TableHead className="text-right bg-muted">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -377,7 +377,7 @@ export default function SubscriptionsPage() {
                               <TableCell>
                                 <div>
                                   <p className="font-medium">{request.clientName}</p>
-                                  <p className="text-sm text-gray-500">{request.clientEmail}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">{request.clientEmail}</p>
                                 </div>
                               </TableCell>
                               <TableCell>
@@ -388,10 +388,10 @@ export default function SubscriptionsPage() {
                               </TableCell>
                               <TableCell>
                                 <p className="font-medium">₹{request.planPrice}</p>
-                                <p className="text-xs text-gray-500">/{request.billingCycle}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">/{request.billingCycle}</p>
                               </TableCell>
                               <TableCell>
-                                <p className="text-sm text-gray-600 max-w-xs truncate" title={request.requestMessage}>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title={request.requestMessage}>
                                   {request.requestMessage || 'No message'}
                                 </p>
                               </TableCell>
@@ -402,7 +402,7 @@ export default function SubscriptionsPage() {
                                 <div className="flex items-center justify-end gap-2">
                                   <Button
                                     size="sm"
-                                    className="bg-green-600 hover:bg-green-700"
+                                    className=""
                                     onClick={() => handleApprove(request)}
                                   >
                                     <CheckCircle className="h-4 w-4 mr-1" />
@@ -410,7 +410,7 @@ export default function SubscriptionsPage() {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant="destructive"
+                                    className="bg-red-600 hover:bg-red-700 text-white"
                                     onClick={() => handleReject(request)}
                                   >
                                     <XCircle className="h-4 w-4 mr-1" />
@@ -432,33 +432,33 @@ export default function SubscriptionsPage() {
                         <CardContent className="pt-6">
                           <div className="space-y-3">
                             <div>
-                              <p className="text-sm text-gray-600">Client</p>
-                              <p className="font-semibold">{request.clientName}</p>
-                              <p className="text-sm text-gray-500">{request.clientEmail}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Client</p>
+                              <p className="font-semibold text-foreground">{request.clientName}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{request.clientEmail}</p>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm text-gray-600">Contact</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Contact</p>
                                 <p className="text-sm">{request.clientContact || 'N/A'}</p>
                               </div>
                               <div>
-                                <p className="text-sm text-gray-600">Requested</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Requested</p>
                                 <p className="text-sm">{new Date(request.requestedAt).toLocaleDateString()}</p>
                               </div>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Plan</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Plan</p>
                               <p className="font-medium">{request.planName}</p>
-                              <p className="text-sm text-gray-500">₹{request.planPrice}/{request.billingCycle}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">₹{request.planPrice}/{request.billingCycle}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Message</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Message</p>
                               <p className="text-sm">{request.requestMessage || 'No message'}</p>
                             </div>
                             <div className="flex gap-2 pt-2">
                               <Button
                                 size="sm"
-                                className="flex-1 bg-green-600 hover:bg-green-700"
+                                className="flex-1"
                                 onClick={() => handleApprove(request)}
                               >
                                 <CheckCircle className="h-4 w-4 mr-1" />
@@ -466,8 +466,7 @@ export default function SubscriptionsPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                variant="destructive"
-                                className="flex-1"
+                                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
                                 onClick={() => handleReject(request)}
                               >
                                 <XCircle className="h-4 w-4 mr-1" />
@@ -512,7 +511,7 @@ export default function SubscriptionsPage() {
               {filteredSubscriptions.length === 0 ? (
                 <div className="text-center py-12">
                   <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-400">
                     {searchTerm ? 'No subscriptions match your search' : 'No subscriptions yet'}
                   </p>
                 </div>
@@ -522,15 +521,15 @@ export default function SubscriptionsPage() {
                   <div className={`${viewMode === 'grid' ? 'block' : 'hidden'}`}>
                     <div className="overflow-x-auto max-h-[500px] overflow-y-auto border rounded-lg">
                       <Table>
-                        <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                        <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
                           <TableRow>
-                            <TableHead className="bg-gray-50">Client</TableHead>
-                            <TableHead className="bg-gray-50">Plan</TableHead>
-                            <TableHead className="bg-gray-50">Price</TableHead>
-                            <TableHead className="bg-gray-50">Start Date</TableHead>
-                            <TableHead className="bg-gray-50">End Date</TableHead>
-                            <TableHead className="bg-gray-50">Status</TableHead>
-                            <TableHead className="bg-gray-50">Auto Renew</TableHead>
+                            <TableHead className="bg-muted">Client</TableHead>
+                            <TableHead className="bg-muted">Plan</TableHead>
+                            <TableHead className="bg-muted">Price</TableHead>
+                            <TableHead className="bg-muted">Start Date</TableHead>
+                            <TableHead className="bg-muted">End Date</TableHead>
+                            <TableHead className="bg-muted">Status</TableHead>
+                            <TableHead className="bg-muted">Auto Renew</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -539,7 +538,7 @@ export default function SubscriptionsPage() {
                               <TableCell className="font-medium">
                                 <div>
                                   <p>{sub.user?.companyName || 'Unknown'}</p>
-                                  <p className="text-sm text-gray-500">{sub.user?.email || ''}</p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">{sub.user?.email || ''}</p>
                                 </div>
                               </TableCell>
                               <TableCell>{sub.plan?.name || 'No Plan'}</TableCell>
@@ -578,30 +577,30 @@ export default function SubscriptionsPage() {
                         <CardContent className="pt-6">
                           <div className="space-y-3">
                             <div>
-                              <p className="text-sm text-gray-600">Client</p>
-                              <p className="font-semibold">{sub.user?.companyName || 'Unknown'}</p>
-                              <p className="text-sm text-gray-500">{sub.user?.email || ''}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Client</p>
+                              <p className="font-semibold text-foreground">{sub.user?.companyName || 'Unknown'}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{sub.user?.email || ''}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Plan</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Plan</p>
                               <p className="font-medium">{sub.plan?.name || 'No Plan'}</p>
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 {sub.plan ? `₹${sub.plan.price}` : 'N/A'}
                               </p>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm text-gray-600">Start Date</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Start Date</p>
                                 <p className="text-sm">{new Date(sub.startDate).toLocaleDateString()}</p>
                               </div>
                               <div>
-                                <p className="text-sm text-gray-600">End Date</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">End Date</p>
                                 <p className="text-sm">{new Date(sub.endDate).toLocaleDateString()}</p>
                               </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm text-gray-600">Status</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
                                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${sub.status === 'active' ? 'bg-green-100 text-green-700' :
                                   sub.status === 'trial' ? 'bg-blue-100 text-blue-700' :
                                     sub.status === 'expired' ? 'bg-red-100 text-red-700' :
@@ -612,7 +611,7 @@ export default function SubscriptionsPage() {
                                 </span>
                               </div>
                               <div>
-                                <p className="text-sm text-gray-600">Auto Renew</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">Auto Renew</p>
                                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${sub.autoRenew ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                                   }`}>
                                   {sub.autoRenew ? 'Yes' : 'No'}
@@ -633,40 +632,40 @@ export default function SubscriptionsPage() {
         {/* Approve Modal */}
         {showApproveModal && selectedRequest && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md bg-white shadow-xl">
-              <CardHeader className="border-b border-gray-200">
-                <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <Card className="w-full max-w-md bg-card shadow-xl">
+              <CardHeader className="border-b">
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                   Approve Plan Request
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="bg-muted p-4 rounded-lg space-y-2">
                   <div>
-                    <span className="text-sm font-semibold text-gray-700">Client:</span>
-                    <span className="text-sm text-gray-900 ml-2">{selectedRequest.clientName}</span>
+                    <span className="text-sm font-semibold text-foreground">Client:</span>
+                    <span className="text-sm">{selectedRequest.clientName}</span>
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-gray-700">Email:</span>
-                    <span className="text-sm text-gray-900 ml-2">{selectedRequest.clientEmail}</span>
+                    <span className="text-sm font-semibold text-foreground">Email:</span>
+                    <span className="text-sm">{selectedRequest.clientEmail}</span>
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-gray-700">Plan:</span>
-                    <span className="text-sm text-gray-900 ml-2">
+                    <span className="text-sm font-semibold text-foreground">Plan:</span>
+                    <span className="text-sm">
                       {selectedRequest.planName} - ₹{selectedRequest.planPrice}/{selectedRequest.billingCycle}
                     </span>
                   </div>
                   {selectedRequest.requestMessage && (
                     <div>
-                      <span className="text-sm font-semibold text-gray-700">Message:</span>
-                      <p className="text-sm text-gray-900 mt-1 italic">{selectedRequest.requestMessage}</p>
+                      <span className="text-sm font-semibold text-foreground">Message:</span>
+                      <p className="text-sm mt-1 italic">{selectedRequest.requestMessage}</p>
                     </div>
                   )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="startDate" className="text-sm font-semibold text-gray-900">
+                    <Label htmlFor="startDate" className="text-sm font-semibold">
                       Start Date <span className="text-red-500">*</span>
                     </Label>
                     <Input
@@ -679,7 +678,7 @@ export default function SubscriptionsPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="endDate" className="text-sm font-semibold text-gray-900">
+                    <Label htmlFor="endDate" className="text-sm font-semibold">
                       End Date <span className="text-red-500">*</span>
                     </Label>
                     <Input
@@ -704,7 +703,7 @@ export default function SubscriptionsPage() {
                 )}
 
                 <div>
-                  <Label htmlFor="approvalNotes" className="text-sm font-semibold text-gray-900">
+                  <Label htmlFor="approvalNotes" className="text-sm font-semibold">
                     Approval Notes (Optional)
                   </Label>
                   <Textarea
@@ -720,7 +719,7 @@ export default function SubscriptionsPage() {
                 <div className="flex gap-3 pt-2">
                   <Button
                     variant="outline"
-                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    className="flex-1"
                     onClick={() => {
                       setShowApproveModal(false);
                       setSelectedRequest(null);
@@ -731,7 +730,7 @@ export default function SubscriptionsPage() {
                     Cancel
                   </Button>
                   <Button
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    className="flex-1"
                     onClick={confirmApprove}
                     disabled={loading || !startDate || !endDate}
                   >
@@ -746,29 +745,29 @@ export default function SubscriptionsPage() {
         {/* Reject Modal */}
         {showRejectModal && selectedRequest && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md bg-white shadow-xl">
-              <CardHeader className="border-b border-gray-200">
-                <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <Card className="w-full max-w-md bg-card shadow-xl">
+              <CardHeader className="border-b">
+                <CardTitle className="text-xl font-bold flex items-center gap-2">
                   <XCircle className="h-6 w-6 text-red-600" />
                   Reject Plan Request
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                   <div>
-                    <span className="text-sm font-semibold text-gray-700">Client:</span>
-                    <span className="text-sm text-gray-900 ml-2">{selectedRequest.clientName}</span>
+                    <span className="text-sm font-semibold text-foreground">Client:</span>
+                    <span className="text-sm ml-2">{selectedRequest.clientName}</span>
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-gray-700">Plan:</span>
-                    <span className="text-sm text-gray-900 ml-2">
+                    <span className="text-sm font-semibold text-foreground">Plan:</span>
+                    <span className="text-sm ml-2">
                       {selectedRequest.planName} - ₹{selectedRequest.planPrice}/{selectedRequest.billingCycle}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="rejectionNotes" className="text-sm font-semibold text-gray-900">
+                  <Label htmlFor="rejectionNotes" className="text-sm font-semibold">
                     Rejection Reason <span className="text-red-500">*</span>
                   </Label>
                   <Textarea
@@ -785,7 +784,7 @@ export default function SubscriptionsPage() {
                 <div className="flex gap-3 pt-2">
                   <Button
                     variant="outline"
-                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
+                    className="flex-1"
                     onClick={() => {
                       setShowRejectModal(false);
                       setSelectedRequest(null);

@@ -363,14 +363,14 @@ export default function SalesPage() {
     <DashboardLayout requiredRole="client">
       <div className="p-3 md:p-6 lg:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Sales</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Sales</h1>
         </div>
 
         {/* Success Message */}
         {showSuccess && (
-          <Card className="mb-6 border-green-200 bg-green-50">
+          <Card className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
             <CardContent className="pt-6">
-              <div className="flex items-center gap-3 text-green-800">
+              <div className="flex items-center gap-3 text-green-800 dark:text-green-200">
                 <CheckCircle className="h-6 w-6" />
                 <div>
                   <p className="font-semibold">Sale completed successfully!</p>
@@ -385,8 +385,8 @@ export default function SalesPage() {
         <div className="flex gap-2 mb-4 md:mb-6">
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'new-sale'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('new-sale')}
           >
@@ -395,8 +395,8 @@ export default function SalesPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'history'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('history')}
           >
@@ -412,7 +412,7 @@ export default function SalesPage() {
             <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Add Items to Cart</CardTitle>
+                  <CardTitle className="text-foreground">Add Items to Cart</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Filters */}
@@ -468,13 +468,13 @@ export default function SalesPage() {
                         ))}
                       </Select>
                       {filteredStock.length === 0 && (filterCategoryId || filterSubCategoryId) && (
-                        <p className="text-sm text-gray-500 mt-1">No stock available for selected filters</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">No stock available for selected filters</p>
                       )}
                     </div>
 
                     {selectedStockItem && (
-                      <div className="md:col-span-2 bg-gray-50 p-3 rounded-md border">
-                        <p className="text-sm text-gray-600">
+                      <div className="md:col-span-2 bg-gray-50 dark:bg-gray-800 p-3 rounded-md border dark:border-gray-700">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           Available: <span className="font-semibold">{selectedStockItem.availableStock} {selectedStockItem.unit}</span> |
                           Avg Rate: <span className="font-semibold">Rs.{selectedStockItem.averageRate}</span>
                           {(() => {
@@ -483,13 +483,13 @@ export default function SalesPage() {
                             return (
                               <>
                                 {inCart > 0 && (
-                                  <span className="ml-2 text-orange-600">
+                                  <span className="ml-2 text-orange-600 dark:text-orange-400">
                                     | In Cart: <span className="font-semibold">{inCart}</span>
                                     {' '}→ Remaining: <span className="font-semibold">{remaining} {selectedStockItem.unit}</span>
                                   </span>
                                 )}
                                 {quantity && parseFloat(quantity) > 0 && (
-                                  <span className="ml-2 text-blue-600">
+                                  <span className="ml-2 text-blue-600 dark:text-blue-400">
                                     | After This: <span className="font-semibold">{(remaining - parseFloat(quantity)).toFixed(2)} {selectedStockItem.unit}</span>
                                   </span>
                                 )}
@@ -528,8 +528,8 @@ export default function SalesPage() {
                   </div>
 
                   {quantity && rate && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                      <p className="text-sm font-medium text-blue-900">
+                    <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-3">
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                         Item Total: Rs.{(parseFloat(quantity) * parseFloat(rate)).toFixed(2)}
                       </p>
                     </div>
@@ -538,9 +538,9 @@ export default function SalesPage() {
                   <Button
                     onClick={handleAddToCart}
                     disabled={!selectedStock || !quantity || !rate}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+
                     Add to Cart
                   </Button>
                 </CardContent>
@@ -549,7 +549,7 @@ export default function SalesPage() {
               {/* Buyer Information */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Buyer Information</CardTitle>
+                  <CardTitle className="text-foreground">Buyer Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
@@ -591,42 +591,42 @@ export default function SalesPage() {
             <div>
               <Card className="sticky top-4">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
                     <ShoppingCart className="h-5 w-5" />
                     Cart ({cart.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   {cart.length === 0 ? (
-                    <p className="text-center text-gray-500 py-8">Cart is empty</p>
+                    <p className="text-center text-gray-500 dark:text-gray-400 py-8">Cart is empty</p>
                   ) : (
                     <div className="space-y-4">
                       {cart.map((item, index) => (
-                        <div key={index} className="border-b pb-3">
+                        <div key={index} className="border-b dark:border-gray-700 pb-3">
                           <div className="flex justify-between items-start mb-2">
                             <div className="flex-1">
-                              <p className="font-medium text-sm">{getCategoryName(item.categoryId)}</p>
-                              <p className="text-xs text-gray-600">{getSubCategoryName(item.subCategoryId)}</p>
+                              <p className="font-medium text-sm text-foreground">{getCategoryName(item.categoryId)}</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">{getSubCategoryName(item.subCategoryId)}</p>
                             </div>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleRemoveFromCart(index)}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              <Trash2 className="h-4 w-4 text-red-500 dark:text-red-400" />
                             </Button>
                           </div>
-                          <div className="text-xs text-gray-600 space-y-1">
+                          <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                             <p>Qty: {item.quantity} × Rs.{item.rate}</p>
-                            <p className="font-semibold text-gray-900">Total: Rs.{item.totalValue.toFixed(2)}</p>
+                            <p className="font-semibold text-foreground">Total: Rs.{item.totalValue.toFixed(2)}</p>
                           </div>
                         </div>
                       ))}
 
-                      <div className="pt-4 border-t">
+                      <div className="pt-4 border-t dark:border-gray-700">
                         <div className="flex justify-between items-center mb-4">
-                          <span className="font-semibold">Grand Total:</span>
-                          <span className="text-2xl font-bold text-green-600">
+                          <span className="font-semibold text-foreground">Grand Total:</span>
+                          <span className="text-2xl font-bold text-green-600 dark:text-green-400">
                             Rs.{getCartTotal().toFixed(2)}
                           </span>
                         </div>
@@ -634,7 +634,7 @@ export default function SalesPage() {
                         {cart.length > 0 && buyerName && buyerContact && (
                           <Button
                             onClick={handleCheckout}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white"
+                            className="w-full"
                           >
                             <Receipt className="h-4 w-4 mr-2" />
                             Complete Sale
@@ -653,37 +653,37 @@ export default function SalesPage() {
         {activeTab === 'history' && (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-foreground">
                 <Receipt className="h-5 w-5" />
                 Sales History ({salesHistory.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               {salesHistory.length === 0 ? (
-                <p className="text-center text-gray-500 py-12">No sales yet. Complete your first sale to see it here.</p>
+                <p className="text-center text-gray-500 dark:text-gray-400 py-12">No sales yet. Complete your first sale to see it here.</p>
               ) : (
                 <div className="space-y-4">
                   {salesHistory.map((sale) => (
-                    <Card key={sale.id} className="border">
+                    <Card key={sale.id} className="border dark:border-gray-700">
                       <CardContent className="pt-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
                             <div>
-                              <p className="text-sm text-gray-600">Invoice Number</p>
-                              <p className="font-semibold">{sale.invoiceNumber}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Invoice Number</p>
+                              <p className="font-semibold text-foreground">{sale.invoiceNumber}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Date</p>
-                              <p className="font-semibold">{new Date(sale.saleDate).toLocaleDateString()}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Date</p>
+                              <p className="font-semibold text-foreground">{new Date(sale.saleDate).toLocaleDateString()}</p>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Buyer</p>
-                              <p className="font-semibold">{sale.buyerName}</p>
-                              {sale.buyerContact && <p className="text-sm text-gray-500">{sale.buyerContact}</p>}
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Buyer</p>
+                              <p className="font-semibold text-foreground">{sale.buyerName}</p>
+                              {sale.buyerContact && <p className="text-sm text-gray-500 dark:text-gray-400">{sale.buyerContact}</p>}
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">Total Amount</p>
-                              <p className="text-xl font-bold text-green-600">Rs.{sale.totalAmount.toFixed(2)}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Total Amount</p>
+                              <p className="text-xl font-bold text-green-600 dark:text-green-400">Rs.{sale.totalAmount.toFixed(2)}</p>
                             </div>
                           </div>
                           <Button
@@ -697,8 +697,8 @@ export default function SalesPage() {
                           </Button>
                         </div>
 
-                        <div className="border-t pt-4">
-                          <p className="text-sm font-semibold mb-2">Items Sold:</p>
+                        <div className="border-t dark:border-gray-700 pt-4">
+                          <p className="text-sm font-semibold mb-2 text-foreground">Items Sold:</p>
                           <Table>
                             <TableHeader>
                               <TableRow>
@@ -724,9 +724,9 @@ export default function SalesPage() {
                         </div>
 
                         {sale.remarks && (
-                          <div className="mt-4 pt-4 border-t">
-                            <p className="text-sm text-gray-600">Remarks:</p>
-                            <p className="text-sm">{sale.remarks}</p>
+                          <div className="mt-4 pt-4 border-t dark:border-gray-700">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Remarks:</p>
+                            <p className="text-sm dark:text-gray-300">{sale.remarks}</p>
                           </div>
                         )}
                       </CardContent>

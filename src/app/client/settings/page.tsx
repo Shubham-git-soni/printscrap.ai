@@ -12,9 +12,11 @@ import { apiClient } from '@/lib/api-client';
 import { showSuccess, showError } from '@/lib/toast';
 import { Subscription, Plan } from '@/lib/types';
 import { Settings as SettingsIcon, User as UserIcon, CreditCard, CheckCircle, Mail, Phone, AlertCircle } from 'lucide-react';
+import { useSiteSettings } from '@/lib/site-settings';
 
 export default function SettingsPage() {
   const { user, setUser } = useAuth();
+  const { settings: siteSettings } = useSiteSettings();
   const [activeTab, setActiveTab] = useState<'profile' | 'subscription'>('profile');
 
   // Profile state
@@ -135,15 +137,15 @@ export default function SettingsPage() {
     <DashboardLayout requiredRole="client">
       <div className="p-3 md:p-6 lg:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Settings</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Settings</h1>
         </div>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 md:mb-6">
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'profile'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('profile')}
           >
@@ -152,8 +154,8 @@ export default function SettingsPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'subscription'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('subscription')}
           >
@@ -166,9 +168,9 @@ export default function SettingsPage() {
         {activeTab === 'profile' && (
           <div className="max-w-2xl">
             {profileSuccess && (
-              <Card className="mb-6 border-green-200 bg-green-50">
+              <Card className="mb-6 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
                 <CardContent className="pt-6">
-                  <div className="flex items-center gap-2 text-green-800">
+                  <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
                     <CheckCircle className="h-5 w-5" />
                     <span>Profile updated successfully!</span>
                   </div>
@@ -229,7 +231,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="pt-4">
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button type="submit">
                       <SettingsIcon className="h-4 w-4 mr-2" />
                       Update Profile
                     </Button>
@@ -243,31 +245,31 @@ export default function SettingsPage() {
                 <CardTitle>Account Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">User ID</span>
-                  <span className="font-medium">{user?.id}</span>
+                <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                  <span className="text-muted-foreground">User ID</span>
+                  <span className="font-medium text-foreground">{user?.id}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Contact Number</span>
-                  <span className="font-medium">{user?.contactNumber || 'N/A'}</span>
+                <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                  <span className="text-muted-foreground">Contact Number</span>
+                  <span className="font-medium text-foreground">{user?.contactNumber || 'N/A'}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Account Status</span>
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${user?.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                  <span className="text-muted-foreground">Account Status</span>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${user?.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
                     }`}>
                     {user?.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span className="text-gray-600">Email Verified</span>
-                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${user?.isVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                  <span className="text-muted-foreground">Email Verified</span>
+                  <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${user?.isVerified ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
                     }`}>
                     {user?.isVerified ? 'Verified' : 'Not Verified'}
                   </span>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="text-gray-600">Member Since</span>
-                  <span className="font-medium">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</span>
+                  <span className="text-muted-foreground">Member Since</span>
+                  <span className="font-medium text-foreground">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </CardContent>
             </Card>
@@ -285,51 +287,51 @@ export default function SettingsPage() {
               <CardContent>
                 {subscription && plan ? (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
+                    <div className="bg-muted/50 p-6 rounded-lg border">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
-                          <p className="text-gray-600 mt-1">{plan.description}</p>
+                          <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
+                          <p className="text-muted-foreground mt-1">{plan.description}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-3xl font-bold text-primary">₹{plan.price}</p>
-                          <p className="text-sm text-gray-600">per {plan.billingCycle || 'month'}</p>
+                          <p className="text-sm text-muted-foreground">per {plan.billingCycle || 'month'}</p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 mt-6">
                         <div>
-                          <p className="text-sm text-gray-600">Status</p>
-                          <span className={`inline-flex px-3 py-1 mt-1 rounded-full text-sm font-medium ${subscription.status === 'active' ? 'bg-green-100 text-green-700' :
-                            subscription.status === 'trial' ? 'bg-blue-100 text-blue-700' :
-                              subscription.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                'bg-yellow-100 text-yellow-700'
+                          <p className="text-sm text-muted-foreground">Status</p>
+                          <span className={`inline-flex px-3 py-1 mt-1 rounded-full text-sm font-medium ${subscription.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                            subscription.status === 'trial' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' :
+                              subscription.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' :
+                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300'
                             }`}>
                             {subscription.status}
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Start Date</p>
-                          <p className="font-medium mt-1">{new Date(subscription.startDate).toLocaleDateString()}</p>
+                          <p className="text-sm text-muted-foreground">Start Date</p>
+                          <p className="font-medium mt-1 text-foreground">{new Date(subscription.startDate).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">End Date</p>
-                          <p className="font-medium mt-1">{new Date(subscription.endDate).toLocaleDateString()}</p>
+                          <p className="text-sm text-muted-foreground">End Date</p>
+                          <p className="font-medium mt-1 text-foreground">{new Date(subscription.endDate).toLocaleDateString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-600">Auto Renew</p>
-                          <p className="font-medium mt-1">{subscription.autoRenew ? 'Yes' : 'No'}</p>
+                          <p className="text-sm text-muted-foreground">Auto Renew</p>
+                          <p className="font-medium mt-1 text-foreground">{subscription.autoRenew ? 'Yes' : 'No'}</p>
                         </div>
                       </div>
 
                       {/* Trial Expiry Warning */}
                       {subscription.status === 'trial' && (
-                        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div className="mt-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                           <div className="flex gap-3">
-                            <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0" />
+                            <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
                             <div>
-                              <p className="font-medium text-yellow-900">Trial Period Active</p>
-                              <p className="text-sm text-yellow-700 mt-1">
+                              <p className="font-medium text-yellow-900 dark:text-yellow-200">Trial Period Active</p>
+                              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
                                 Your trial ends on {new Date(subscription.endDate).toLocaleDateString()}.
                                 Contact us to activate a paid plan and continue using all features.
                               </p>
@@ -340,12 +342,12 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="border-t pt-4">
-                      <h4 className="font-semibold mb-3">Plan Features:</h4>
+                      <h4 className="font-semibold mb-3 text-foreground">Plan Features:</h4>
                       <ul className="space-y-2">
                         {plan.features.map((feature, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-700">{feature}</span>
+                            <span className="text-foreground">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -353,9 +355,9 @@ export default function SettingsPage() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600 mb-4">No active subscription</p>
-                    <p className="text-sm text-gray-500">Contact your administrator to activate a subscription</p>
+                    <CreditCard className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">No active subscription</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Contact your administrator to activate a subscription</p>
                   </div>
                 )}
               </CardContent>
@@ -365,19 +367,19 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Available Plans</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">Choose a plan that fits your business needs</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Choose a plan that fits your business needs</p>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {allPlans.map((availablePlan) => (
-                    <Card key={availablePlan.id} className="border-2 hover:shadow-lg transition-shadow">
-                      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
-                        <CardTitle className="text-xl">{availablePlan.name}</CardTitle>
-                        <p className="text-sm text-gray-600">{availablePlan.description}</p>
+                    <Card key={availablePlan.id} className="border hover:shadow-lg transition-shadow">
+                      <CardHeader className="bg-muted/50">
+                        <CardTitle className="text-xl text-foreground">{availablePlan.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{availablePlan.description}</p>
                         <div className="mt-4">
                           <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-bold text-primary">₹{availablePlan.price}</span>
-                            <span className="text-gray-600">/ {availablePlan.billingCycle || 'month'}</span>
+                            <span className="text-muted-foreground">/ {availablePlan.billingCycle || 'month'}</span>
                           </div>
                         </div>
                       </CardHeader>
@@ -385,8 +387,8 @@ export default function SettingsPage() {
                         <ul className="space-y-2 mb-4">
                           {availablePlan.features.map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-2 text-sm">
-                              <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                              <span>{feature}</span>
+                              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                              <span className="text-foreground">{feature}</span>
                             </li>
                           ))}
                         </ul>
@@ -397,7 +399,7 @@ export default function SettingsPage() {
                         ) : (
                           <Button
                             variant="outline"
-                            className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                            className="w-full"
                             onClick={() => handleSelectPlan(availablePlan.id)}
                           >
                             Request This Plan
@@ -412,13 +414,13 @@ export default function SettingsPage() {
 
             {/* Request Success Message */}
             {requestSuccess && (
-              <Card className="border-green-200 bg-green-50">
+              <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
                 <CardContent className="pt-6">
-                  <div className="flex items-center gap-2 text-green-800">
+                  <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
                     <CheckCircle className="h-5 w-5" />
                     <span className="font-medium">Plan activation request submitted successfully!</span>
                   </div>
-                  <p className="text-sm text-green-700 mt-2">
+                  <p className="text-sm text-green-700 dark:text-green-300 mt-2">
                     Our admin will review your request and activate your plan within 24 hours.
                   </p>
                 </CardContent>
@@ -437,19 +439,19 @@ export default function SettingsPage() {
                 <CardContent>
                   <form onSubmit={handlePlanRequest} className="space-y-4">
                     {requestError && (
-                      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                        <div className="flex items-center gap-2 text-red-800">
+                      <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
                           <AlertCircle className="h-5 w-5" />
                           <span className="font-medium">{requestError}</span>
                         </div>
                       </div>
                     )}
 
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                      <p className="text-sm text-gray-700">
+                    <div className="bg-muted/50 p-4 rounded-lg border">
+                      <p className="text-sm text-foreground">
                         <strong>Selected Plan:</strong> {allPlans.find(p => p.id === selectedPlanId)?.name}
                       </p>
-                      <p className="text-sm text-gray-700 mt-1">
+                      <p className="text-sm text-foreground mt-1">
                         <strong>Price:</strong> ₹{allPlans.find(p => p.id === selectedPlanId)?.price} / {allPlans.find(p => p.id === selectedPlanId)?.billingCycle}
                       </p>
                     </div>
@@ -482,7 +484,7 @@ export default function SettingsPage() {
                       </Button>
                       <Button
                         type="submit"
-                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        className="flex-1"
                       >
                         Submit Request
                       </Button>
@@ -496,28 +498,28 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Need Help?</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   Contact us if you have any questions about our plans
                 </p>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <Mail className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg border">
+                    <Mail className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Email Us</p>
-                      <a href="mailto:wecare@indusanalytics.in" className="text-blue-600 hover:underline mt-1 block">
-                        wecare@indusanalytics.in
+                      <p className="font-semibold text-foreground">Email Us</p>
+                      <a href={`mailto:${siteSettings.supportEmail}`} className="text-primary hover:underline mt-1 block">
+                        {siteSettings.supportEmail}
                       </a>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <Phone className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
+                  <div className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg border">
+                    <Phone className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
                     <div>
-                      <p className="font-semibold text-gray-900">Call Us</p>
-                      <a href="tel:+918269598608" className="text-green-600 hover:underline mt-1 block">
-                        +91 82695 98608
+                      <p className="font-semibold text-foreground">Call Us</p>
+                      <a href={`tel:${siteSettings.supportPhone.replace(/\s/g, '')}`} className="text-primary hover:underline mt-1 block">
+                        {siteSettings.supportPhone}
                       </a>
                     </div>
                   </div>

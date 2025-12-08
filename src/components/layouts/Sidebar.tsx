@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
@@ -17,7 +18,9 @@ import {
   LogOut,
   X,
   ChevronLeft,
-  BarChart3
+  BarChart3,
+  Moon,
+  Sun
 } from 'lucide-react';
 
 const clientLinks = [
@@ -34,6 +37,7 @@ const superAdminLinks = [
   { href: '/super-admin/clients', label: 'Clients', icon: Users },
   { href: '/super-admin/subscriptions', label: 'Subscriptions', icon: CalendarDays },
   { href: '/super-admin/plans', label: 'Plans', icon: CreditCard },
+  { href: '/super-admin/settings', label: 'Settings', icon: Settings },
 ];
 
 interface SidebarProps {
@@ -46,6 +50,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose, isDesktopCollapsed = false, onDesktopToggle }: SidebarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const links = user?.role === 'super_admin' ? superAdminLinks : clientLinks;
 
@@ -61,7 +66,7 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed = false, onDesktop
 
       {/* Sidebar */}
       <div className={cn(
-        "flex flex-col bg-gray-900 text-white fixed z-50 shadow-2xl lg:shadow-none transition-all duration-300 ease-in-out",
+        "flex flex-col bg-sidebar text-sidebar-foreground fixed z-50 shadow-2xl lg:shadow-lg lg:border-r lg:border-sidebar-border transition-all duration-300 ease-in-out",
         // Desktop: collapsible sidebar with fixed positioning
         "lg:top-0 lg:left-0 lg:bottom-0 lg:h-screen",
         isDesktopCollapsed ? "lg:w-20" : "lg:w-64",
@@ -73,28 +78,27 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed = false, onDesktop
       )}>
         {/* Handle bar for mobile */}
         <div className="lg:hidden flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-700 rounded-full"></div>
+          <div className="w-12 h-1.5 bg-sidebar-accent rounded-full"></div>
         </div>
 
         {/* Logo */}
         <div className={cn(
-          "border-b border-gray-800 flex items-center",
+          "border-b border-sidebar-border flex items-center",
           isDesktopCollapsed ? "lg:p-4 lg:justify-center p-6 justify-between" : "p-6 justify-between"
         )}>
           <Link href="/" className="flex items-center gap-2">
-            <Package className="h-8 w-8 text-blue-400 flex-shrink-0" />
+            <Package className="h-8 w-8 text-sidebar-primary flex-shrink-0" />
             <div className={cn(
               "transition-all duration-300",
               isDesktopCollapsed ? "lg:hidden" : ""
             )}>
-              <div className="font-bold text-lg">PrintScrap.ai</div>
-              <div className="text-xs text-gray-400">{user?.role === 'super_admin' ? 'Admin Panel' : user?.companyName}</div>
+              <div className="font-bold text-lg text-sidebar-foreground">PrintScrap.ai</div>
             </div>
           </Link>
           {/* Close button for mobile */}
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -103,13 +107,13 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed = false, onDesktop
             <button
               onClick={onDesktopToggle}
               className={cn(
-                "hidden lg:block p-2 rounded-lg hover:bg-gray-800 transition-all duration-300",
+                "hidden lg:block p-2 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-300",
                 isDesktopCollapsed ? "absolute top-4 right-2" : ""
               )}
               title={isDesktopCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <ChevronLeft className={cn(
-                "h-5 w-5 transition-transform duration-300",
+                "h-5 w-5 text-sidebar-foreground transition-transform duration-300",
                 isDesktopCollapsed ? "rotate-180" : ""
               )} />
             </button>
@@ -131,11 +135,11 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed = false, onDesktop
                 href={link.href}
                 onClick={() => onClose()}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+                  'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium',
                   isDesktopCollapsed ? 'lg:justify-center lg:px-2' : '',
                   isActive
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm'
+                    : 'text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                 )}
                 title={isDesktopCollapsed ? link.label : undefined}
               >
@@ -151,24 +155,46 @@ export function Sidebar({ isOpen, onClose, isDesktopCollapsed = false, onDesktop
 
         {/* User Info & Logout - Desktop only */}
         <div className={cn(
-          "border-t border-gray-800 hidden lg:block",
+          "border-t border-sidebar-border hidden lg:block",
           isDesktopCollapsed ? "lg:p-2" : "p-4"
         )}>
           <div className={cn(
-            "mb-3 px-4 py-2 bg-gray-800 rounded-lg",
+            "mb-3 px-4 py-2 bg-sidebar-accent rounded-lg border border-sidebar-border/30",
             isDesktopCollapsed ? "lg:hidden" : ""
           )}>
-            <div className="text-sm font-medium text-white truncate" title={user?.email}>
+            <div className="text-sm font-semibold text-sidebar-accent-foreground truncate" title={user?.email}>
               {user?.email}
             </div>
-            <div className="text-xs text-gray-400 capitalize mt-1">
+            <div className="text-xs text-sidebar-foreground/60 capitalize mt-1 font-medium">
               {user?.role?.replace('_', ' ')}
             </div>
           </div>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-lg w-full text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors mb-2 font-medium",
+              isDesktopCollapsed ? "lg:justify-center lg:px-2" : ""
+            )}
+            title={isDesktopCollapsed ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : undefined}
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-5 w-5 flex-shrink-0" />
+            ) : (
+              <Moon className="h-5 w-5 flex-shrink-0" />
+            )}
+            <span className={cn(
+              "transition-all duration-300",
+              isDesktopCollapsed ? "lg:hidden" : ""
+            )}>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
+
+          {/* Logout */}
           <button
             onClick={logout}
             className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-lg w-full text-gray-300 hover:bg-gray-800 hover:text-white transition-colors",
+              "flex items-center gap-3 px-4 py-3 rounded-lg w-full text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors font-medium",
               isDesktopCollapsed ? "lg:justify-center lg:px-2" : ""
             )}
             title={isDesktopCollapsed ? "Logout" : undefined}

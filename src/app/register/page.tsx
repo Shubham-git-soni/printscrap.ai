@@ -86,19 +86,19 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-              <h2 className="text-2xl font-bold text-gray-900">Registration Successful!</h2>
-              <p className="text-gray-600">
+              <CheckCircle className="h-16 w-16 text-primary mx-auto" />
+              <h2 className="text-2xl font-bold text-foreground">Registration Successful!</h2>
+              <p className="text-muted-foreground">
                 A verification email has been sent to <strong>{formData.email}</strong>.
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Please verify your email to activate your account.
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Redirecting to login...
               </p>
             </div>
@@ -109,7 +109,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -117,7 +117,7 @@ export default function RegisterPage() {
             <Package className="h-10 w-10 text-primary" />
             <span className="text-3xl font-bold text-primary">PrintScrap.ai</span>
           </Link>
-          <p className="text-gray-600">Create your account</p>
+          <p className="text-muted-foreground">Create your account</p>
         </div>
 
         {/* Register Card */}
@@ -128,7 +128,7 @@ export default function RegisterPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                <div className="bg-destructive/10 border border-destructive text-destructive-foreground px-4 py-3 rounded-md">
                   <span className="text-sm">{error}</span>
                 </div>
               )}
@@ -217,7 +217,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                className="w-full"
                 disabled={isLoading}
               >
                 {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -225,13 +225,13 @@ export default function RegisterPage() {
             </form>
 
             <div className="mt-6 text-center space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link href="/login" className="text-primary font-medium hover:underline">
                   Login here
                 </Link>
               </p>
-              <Link href="/" className="text-sm text-gray-500 hover:text-gray-700 block">
+              <Link href="/" className="text-sm text-muted-foreground hover:text-foreground block">
                 &larr; Back to home
               </Link>
             </div>

@@ -53,18 +53,18 @@ export default function VerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
             {status === 'loading' && (
-              <Loader2 className="h-8 w-8 text-white animate-spin" />
+              <Loader2 className="h-8 w-8 text-primary-foreground animate-spin" />
             )}
             {status === 'success' && (
-              <CheckCircle2 className="h-8 w-8 text-white" />
+              <CheckCircle2 className="h-8 w-8 text-primary-foreground" />
             )}
             {status === 'error' && (
-              <XCircle className="h-8 w-8 text-white" />
+              <XCircle className="h-8 w-8 text-primary-foreground" />
             )}
           </div>
           <CardTitle className="text-2xl font-bold">
@@ -80,22 +80,20 @@ export default function VerifyEmailPage() {
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <div
-            className={`p-4 rounded-lg ${
-              status === 'success'
-                ? 'bg-green-50 border border-green-200'
+            className={`p-4 rounded-lg ${status === 'success'
+                ? 'bg-primary/10 border border-primary'
                 : status === 'error'
-                ? 'bg-red-50 border border-red-200'
-                : 'bg-blue-50 border border-blue-200'
-            }`}
+                  ? 'bg-destructive/10 border border-destructive'
+                  : 'bg-muted border border-border'
+              }`}
           >
             <p
-              className={`text-sm ${
-                status === 'success'
-                  ? 'text-green-700'
+              className={`text-sm ${status === 'success'
+                  ? 'text-primary'
                   : status === 'error'
-                  ? 'text-red-700'
-                  : 'text-blue-700'
-              }`}
+                    ? 'text-destructive-foreground'
+                    : 'text-muted-foreground'
+                }`}
             >
               {message}
             </p>
@@ -103,12 +101,12 @@ export default function VerifyEmailPage() {
 
           {status === 'success' && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 You can now log in to your account and start using PrintScrap.ai.
               </p>
               <Button
                 onClick={handleLoginRedirect}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                className="w-full"
               >
                 Go to Login
               </Button>
@@ -117,7 +115,7 @@ export default function VerifyEmailPage() {
 
           {status === 'error' && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 If you continue to have issues, please contact support or try registering again.
               </p>
               <div className="flex gap-2">
@@ -130,7 +128,7 @@ export default function VerifyEmailPage() {
                 </Button>
                 <Button
                   onClick={() => router.push('/register')}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  className="flex-1"
                 >
                   Register Again
                 </Button>
@@ -139,7 +137,7 @@ export default function VerifyEmailPage() {
           )}
 
           {status === 'loading' && (
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               This should only take a moment...
             </div>
           )}

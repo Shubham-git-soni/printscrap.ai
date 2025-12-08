@@ -259,15 +259,15 @@ export default function ScrapEntryPage() {
     <DashboardLayout requiredRole="client">
       <div className="p-3 md:p-6 lg:p-8">
         <div className="mb-4 md:mb-6">
-          <h1 className="text-lg md:text-xl font-bold text-gray-900">Scrap Entry</h1>
+          <h1 className="text-lg md:text-xl font-bold text-foreground">Scrap Entry</h1>
         </div>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-4 md:mb-6">
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'job-based'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('job-based')}
           >
@@ -276,8 +276,8 @@ export default function ScrapEntryPage() {
           </button>
           <button
             className={`py-1.5 md:py-2 px-3 md:px-4 rounded-full font-medium flex items-center gap-1.5 md:gap-2 text-xs md:text-sm transition-all ${activeTab === 'general'
-              ? 'bg-slate-700 text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             onClick={() => setActiveTab('general')}
           >
@@ -291,7 +291,7 @@ export default function ScrapEntryPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <FileText className="h-5 w-5" />
                   Add Job-Based Scrap Entry
                 </CardTitle>
@@ -419,7 +419,7 @@ export default function ScrapEntryPage() {
                         required
                         disabled
                         placeholder="Auto-filled from category"
-                        className="bg-gray-100 cursor-not-allowed"
+                        className="bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -436,14 +436,14 @@ export default function ScrapEntryPage() {
                   </div>
 
                   {jobEntry.quantity && jobEntry.rate && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                      <p className="text-sm font-medium text-blue-900">
+                    <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                         Total Value: Rs.{(parseFloat(jobEntry.quantity) * parseFloat(jobEntry.rate)).toFixed(2)}
                       </p>
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white">
+                  <Button type="submit" className="w-full md:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Job-Based Entry
                   </Button>
@@ -458,7 +458,7 @@ export default function ScrapEntryPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <Package className="h-5 w-5" />
                   Add General Scrap Entry
                 </CardTitle>
@@ -575,7 +575,7 @@ export default function ScrapEntryPage() {
                         required
                         disabled
                         placeholder="Auto-filled from category"
-                        className="bg-gray-100 cursor-not-allowed"
+                        className="bg-gray-100 dark:bg-gray-800 cursor-not-allowed"
                       />
                     </div>
                   </div>
@@ -592,14 +592,14 @@ export default function ScrapEntryPage() {
                   </div>
 
                   {generalEntry.quantity && generalEntry.rate && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                      <p className="text-sm font-medium text-blue-900">
+                    <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                      <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                         Total Value: Rs.{(parseFloat(generalEntry.quantity) * parseFloat(generalEntry.rate)).toFixed(2)}
                       </p>
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white">
+                  <Button type="submit" className="w-full md:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     Add General Entry
                   </Button>
@@ -612,14 +612,14 @@ export default function ScrapEntryPage() {
         {/* Recent Entries */}
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <Calendar className="h-5 w-5" />
               Recent Entries ({recentEntries.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
             {recentEntries.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No entries yet. Add your first scrap entry above.</p>
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">No entries yet. Add your first scrap entry above.</p>
             ) : (
               <Table>
                 <TableHeader>
@@ -642,8 +642,8 @@ export default function ScrapEntryPage() {
                       <TableCell>{new Date(entry.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${entry.entryType === 'job-based'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-green-100 text-green-700'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                          : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
                           }`}>
                           {entry.entryType}
                         </span>
